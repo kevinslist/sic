@@ -1,0 +1,33 @@
+#content-wrapper{
+  border-collapse: collapse;
+  margin: 0px;
+  padding: 0px;
+	height: 100%;
+}
+
+#content-wrapper td{
+	height: 100%;
+	vertical-align: top;
+}
+.column-wrapper{
+	position: relative;
+	height: 100%;
+}
+
+#content-wrapper td div.width-adjuster{
+	width: 4px;
+	height: 100%;
+	background-color: #eee;
+	border-left: 1px solid #ddd;
+	cursor: e-resize;
+	float: right;
+}
+
+#collection-pane,
+#playlists-pane{
+	width: 200px;
+}
+
+#songs-wrapper div.column-wrapper{
+	overflow-y: scroll;
+}

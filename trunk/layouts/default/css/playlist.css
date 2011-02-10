@@ -1,0 +1,77 @@
+.ui-layout-center{
+  overflow: hidden;
+}
+.playlist-wrapper{
+  position: relative;
+  clear: both;
+}
+.playlist-wrapper th,
+.playlist-wrapper td{
+  border-right: 1px solid #eee;
+  padding: 0px 2px 0px 3px;
+  text-align: left;
+  width: 50px;
+}
+.playlist-wrapper th.title-column,
+.playlist-wrapper td.title-column{
+  width: 100px;
+}
+.playlist-wrapper th.artist-column,
+.playlist-wrapper td.artist-column{
+  width: 30%;
+}
+.playlist-wrapper th.album-column,
+.playlist-wrapper td.album-column{
+  width: 30%;
+}
+.playlist-wrapper th.comment-column,
+.playlist-wrapper td.comment-column{
+  width: 40%;
+}
+.playlist-wrapper th.rating-column,
+.playlist-wrapper td.rating-column{
+  border-right: none;
+  width: 70px;
+  text-align: center;
+}
+
+
+
+.playlist-header-wrapper{
+  background-color: #fafcfb;
+  border-bottom: 1px solid #bbb;
+  padding-right: 15px;
+}
+.playlist-header{
+  table-layout: fixed;
+  width: 100%;
+}
+.playlist-header th{
+  color: #506576;
+  font-weight: normal;
+  height: 20px;
+}
+.playlist-table-wrapper{
+  background-color: #fff;
+  overflow-y: scroll;
+}
+.playlist-table{
+  display: none;
+  table-layout: fixed;
+  width: 100%;
+}
+.playlist-table tbody{
+}
+.playlist-table tbody tr.odd{
+  background-color: #f9fbfc;
+
+}
+.playlist-table tbody td{
+  border-bottom: 1px solid #f4f6f9;
+  font-size: 92%;
+  line-height: 1.5em;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.playlist-table tbody td span{
+}
