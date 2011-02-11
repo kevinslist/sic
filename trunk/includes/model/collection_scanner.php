@@ -10,7 +10,7 @@ class collection_scanner {
   static function menu() {
     self::$data['lastrun'] = current(settings::val('collection_scanner_directory'));
     System_Daemon::setOptions(self::daemon_options());
-    self::$data['collection_scanner_daemon_running'] = System_Daemon::isRunning();gyt
+    self::$data['collection_scanner_daemon_running'] = System_Daemon::isRunning();
     return self::$data;
   }
 
