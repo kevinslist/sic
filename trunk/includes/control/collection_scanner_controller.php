@@ -6,7 +6,7 @@ class collection_scanner_controller extends controller{
     $slug = app::next();
     switch($slug){
       case('start'):
-        $this->view($slug, collection_scanner::start($slug));
+        $this->view($slug, collection_scanner::start_collection_scanner($slug));
         break;
       default:
         $this->view($slug, collection_scanner::menu($slug));

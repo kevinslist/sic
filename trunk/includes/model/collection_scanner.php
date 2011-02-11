@@ -10,12 +10,11 @@ class collection_scanner {
   static function menu() {
     self::$data['lastrun'] = current(settings::val('collection_scanner_directory'));
     System_Daemon::setOptions(self::daemon_options());
-    self::$data['collection_scanner_daemon_running'] = System_Daemon::isRunning();
-
+    self::$data['collection_scanner_daemon_running'] = System_Daemon::isRunning();gyt
     return self::$data;
   }
 
-  static function start() {
+  static function start_collection_scanner() {
     // if not running
     $command = 'php ' . APP_SCRIPTS . 'collection_scanner_start.php';
     shell_exec($command);
@@ -24,7 +23,7 @@ class collection_scanner {
     return self::$data;
   }
 
-  static function run_scanner() {
+  static function start_collection_scanner_daemon() {
     $options = self::daemon_options();
     $options['logVerbosity'] = 6;
     System_Daemon::setOptions($options);
@@ -40,12 +39,6 @@ class collection_scanner {
     System_Daemon::info('TIME START: %s', $ts);
     
      //!System_Daemon::isDying()
-    db::$force_new = true;
-    $dirs = settings::val('collection_scanner_directory');
-    foreach($dirs as $d){
-      //System_Daemon::info('scanning: %s', $d);
-      self::$directory_tree[$d] = self::scan_directory_recursively($d);
-    }
     $te = time();
     $tt = $te - $ts;
     
@@ -53,6 +46,31 @@ class collection_scanner {
     System_Daemon::info('TIME TOTAL: %s', $tt);
     System_Daemon::stop();
   }
+  
+  function begin_collection_scanning($dirs){
+    db::$force_new = true;
+    $collection_id = time();
+    $dirs = settings::val('collection_scanner_directory');
+    foreach($dirs as $d){
+      //System_Daemon::info('scanning: %s', $d);
+      self::$directory_tree[$d] = self::scan_directory_recursively($d);
+    }
+    
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 
   function scan_directory_recursively($directory, $filter=FALSE) {
     //System_Daemon::info('in scan dir: %s', $directory);

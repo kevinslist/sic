@@ -7,4 +7,4 @@ ini_set('display_errors', 1);
 require_once('../app.php');
 app::init();
 
-collection_scanner::run_scanner();
+collection_scanner::start_collection_scanner_daemon();
