@@ -3,11 +3,21 @@ define('SETTINGS_DEFAULT_KEY', 'oynsadfkltb');
 class settings{
   //static $default_key = 'oynhasltb';
 	
+  public static function vals($key = null, $values = array()){
+    if(is_null($values)){
+      return self::delete($key);
+    }elseif(empty($values)){
+      return self::get($key);
+    }else{
+      return self::set($key, $values);
+    }
+  }
+	
   public static function val($key = null, $value = SETTINGS_DEFAULT_KEY){
     if(is_null($value)){
       return self::delete($key);
     }elseif(SETTINGS_DEFAULT_KEY == $value){
-      return self::get($key);
+      return current(self::get($key));
     }else{
       return self::set($key, $value);
     }

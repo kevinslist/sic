@@ -9,13 +9,13 @@ class db {
   
   static function connect($data_source=null) {
   	$x = empty($data_source) ? 'default' : $data_source;
-    if(!isset(db::$db_connections) || empty(db::$db_connections)){
-      db::$db_connections = array();    
+    if(!isset(self::$db_connections) || empty(self::$db_connections)){
+      self::$db_connections = array();    
     }
-    if (self::$force_new || !isset(db::$db_connections[$x])) {
-      db::$db_connections[$x] = self::make_connection(app::dsn($data_source));
+    if (self::$force_new || !isset(self::$db_connections[$x])) {
+      self::$db_connections[$x] = self::make_connection(app::dsn($data_source));
     } else {
-      db::$con = $db_connections[$x];
+      self::$con = self::$db_connections[$x];
     }
   }
 
@@ -65,6 +65,15 @@ class db {
       //throw new Exception(var_export(self::$s->errorInfo(), true));
     }
     return $r;
+  }
+
+  static function settings($sql, $p = null, $ds=null) {
+    $r = self::query($sql, $p, $ds);
+    $settings = array();
+    foreach($r as $s){
+      $settings[$s['name']] = $s['value'];
+    }
+    return $settings;
   }
 
   static function row($sql, $p = null, $ds=null) {
