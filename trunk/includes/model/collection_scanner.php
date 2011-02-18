@@ -224,12 +224,11 @@ class collection_scanner {
       
       closedir($directory_list);
       
-      if($count > 0){
-        if($mp3_count > 0){
-            $m = filemtime($directory);
-            db::exec('INSERT INTO dirs (name,lastmod,scan_id) VALUES(?,?,?) ON DUPLICATE KEY UPDATE lastmod=?, scan_id=?',
-              array($directory, (int)$m, (int)self::$settings['id'], (int)$m, (int)self::$settings['id']) );
-        }
+      if($count > 0 && $mp3_count > 0){
+        $m = filemtime($directory);
+        db::exec('INSERT INTO dirs (name,lastmod,scan_id) VALUES(?,?,?) ON DUPLICATE KEY UPDATE lastmod=?, scan_id=?',
+          array($directory, (int)$m, (int)self::$settings['id'], (int)$m, (int)self::$settings['id']) );
+  
       }else if(0==$count){
         // delete $directory
         //System_Daemon::info('DELETE DIR: %s', $directory);
