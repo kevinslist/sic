@@ -13,7 +13,8 @@
   <script type="text/javascript" src="<?=APP_HOME_JS?>collection_scanner/collection_scanner_menu.js"></script>
 </head>
 <body id="page-body-menu" class="collection-scanner-menu">
-  Running: <?=$status?><br/>
+  Running: <?=$running?><br/>
+  Status: <?=$status?><br/>
   Last Run: <?=$id?><br/>
   Dirs: <?php print_r($directories);?><br/>
   <input type="button" value="start" class="start-collection-scanner-button" />

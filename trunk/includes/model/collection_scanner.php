@@ -13,6 +13,8 @@ class collection_scanner {
   static $tree = array();
   static $data = array();
   static $settings = array();
+  static $song_filter  = array('mp3', 'm4a', 'flac', 'm4b', 'wma', 'mp4', 'mpg', 'm4r', 'mid', 'mpg', 'm4p');
+  static $image_filter = array('jpg', 'jpeg', 'gif', 'png', 'xcf', 'bmp');
   
   static function settings(){
     self::$settings = db::settings('SELECT * FROM collection_scanner_settings');
@@ -101,17 +103,55 @@ class collection_scanner {
   }
   
   static function scan_modified_directories(){
+    require_once APP_LIB . 'getid3/getid3/getid3.php';
     $dirs = db::vals('SELECT name FROM dirs WHERE lastmod > prev_scan');      
     System_Daemon::info('scan_modified_directories: %s', count($dirs));
+    $i = 0;
+    
+    $getID3 = new getID3;
+    
     foreach($dirs as $d){
-      self::scan_directory($d);      
+      $info = self::scan_directory($d);  
+      
+      $empty = count($info['songs']);
+      
+      foreach($info['songs'] as $s){
+        
+        System_Daemon::info('PARSE: %s', $s);
+        $data = $getID3->analyze($s);
+        //getid3_lib::CopyTagsToComments($data);
+        
+        foreach($data as $k=>$v){
+          System_Daemon::info('KEY: %s', $k);
+          if('comments_html' == $k){
+            foreach($v as $c=>$f){
+              System_Daemon::info('COMMENT(%s): %s', $c, $f);
+            }
+            
+          }elseif('id3v2' == $k){
+            foreach($v as $c=>$f){
+              System_Daemon::info('id3v2 [%s]: %s', $c, $f);
+            }
+         
+          }else{
+            System_Daemon::info('VALUE: %s', $v);
+          }
+        }
+        
+      }
+      
+      db::exec('UPDATE dirs SET prev_scan = ? WHERE name = ?', array($empty, $directory));
+      
+      if($i++ > 3){
+        break;
+      }
     }
     
   }
   
   static function scan_directory($directory = false){
-    $filter = array('mp3');
-    $ps = 0;
+
+    $info = array('songs'=>array(), 'images'=>array());
     
     if (!file_exists($directory) || !is_dir($directory) || !is_readable($directory)) {
       db::exec('DELETE FROM dirs WHERE name=?', $directory);
@@ -123,21 +163,20 @@ class collection_scanner {
           if (is_readable($path) && is_file($path)) {
               $extension = strtolower(end(explode('.', $file)));
               
-              if (in_array($extension, $filter)) {
-                $ps++;
-                // parse mp3 id3 / insert into DB or update
+              if ('' == $extension || in_array($extension, self::$song_filter)) {
+                $info['songs'][] = $path;
+              }elseif(in_array($extension, self::$image_filter)) {   
+                $info['images'][] = $path;
               }else{    
                 db::exec('INSERT INTO other_files (path) values(?)', $path);
-                
               }
           }
         }
       }
       closedir($directory_list);
       //time()
-      db::exec('UPDATE dirs SET prev_scan = ? WHERE name = ?', array($ps, $directory));
     }
-    return;
+    return $info;
   }
   
   
@@ -145,49 +184,57 @@ class collection_scanner {
     foreach(self::$settings['directories'] as $d){
       self::scan_directory_recursively($d);
     }
-    foreach(self::$tree as $d => $m){
-      db::exec('INSERT INTO dirs (name,lastmod,scan_id) VALUES(?,?,?) ON DUPLICATE KEY UPDATE lastmod=?, scan_id=?',
-              array($d, (int)$m, (int)self::$settings['id'], (int)$m, (int)self::$settings['id']) );
-    }
     db::exec('DELETE FROM dirs WHERE scan_id <> ?', (int)self::$settings['id']);
   }
   
 
-  function scan_directory_recursively($directory, $filter=FALSE) {
-    //System_Daemon::info('in scan dir: %s', $directory);
+  function scan_directory_recursively($directory) {
+    $count = -1;
+    $mp3_count = 0;
+    
+    $dir = false;
     if (substr($directory, -1) == '/') {
       $directory = substr($directory, 0, -1);
     }
     if (!file_exists($directory) || !is_dir($directory)) {
       return FALSE;
     } elseif (is_readable($directory)) {
+      $count++;
       $directory_list = opendir($directory);
+      
       while ($file = readdir($directory_list)) {
         if ($file != '.' && $file != '..') {
+          $count++;
           $path = $directory . '/' . $file;
-          
           if (is_readable($path)) {
             if (is_dir($path)) {
-              self::$tree[$path] = filemtime($path);
-              self::scan_directory_recursively($path, $filter);
-            } 
-            /*elseif (is_file($path)) {
-              $extension = end(explode('.', end($subdirectories)));
-              if ($filter === FALSE || $filter == $extension) {
-                $directory_tree[] = array(
-                    'path' => $path,
-                    'name' => end($subdirectories),
-                    'extension' => $extension,
-                    'size' => filesize($path),
-                    'kind' => 'file');
+              self::scan_directory_recursively($path);
+            }elseif(is_file($path)){
+              $extension = strtolower(end(explode('.', $file)));
+              
+              if ('' == $extension || in_array($extension, self::$song_filter)) {
+                $mp3_count++;
+              }else if(!in_array($extension, self::$image_filter)){
+                db::exec('INSERT INTO extensions (name) VALUES (?)', $extension);
               }
             }
-             * 
-             */
           }
         }
       }
+      
       closedir($directory_list);
+      
+      if($count > 0){
+        if($mp3_count > 0){
+            $m = filemtime($directory);
+            db::exec('INSERT INTO dirs (name,lastmod,scan_id) VALUES(?,?,?) ON DUPLICATE KEY UPDATE lastmod=?, scan_id=?',
+              array($directory, (int)$m, (int)self::$settings['id'], (int)$m, (int)self::$settings['id']) );
+        }
+      }else if(0==$count){
+        // delete $directory
+        //System_Daemon::info('DELETE DIR: %s', $directory);
+      }
+      
     }
     return;
   }
