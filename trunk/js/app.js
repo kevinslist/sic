@@ -8,6 +8,7 @@ $(function(){
   //$('#content').load(home+'content');
 
   applog('page-load: ' + home);
+  $('#application-navigation').load(home+'navigation');
   $('#layout-header').load(home+'header');
 });
 

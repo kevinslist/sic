@@ -602,7 +602,7 @@ class getid3_id3v2
 			// Identifier              <up to 64 bytes binary data>
 			$exploded = explode("\x00", $parsedFrame['data'], 2);
 			$parsedFrame['ownerid'] = (isset($exploded[0]) ? $exploded[0] : '');
-			$parsedFrame['data']    = (isset($exploded[1]) ? $exploded[1] : '');
+			$parsedFrame['identifier']    = (isset($exploded[1]) ? $exploded[1] : '');
 			unset($parsedFrame['data']);
 
 		} elseif ((($id3v2_majorversion >= 3) && ($parsedFrame['frame_name'] == 'TXXX')) || // 4.2.2 TXXX User defined text information frame
@@ -634,7 +634,7 @@ class getid3_id3v2
 			$parsedFrame['description'] = $frame_description;
 			$parsedFrame['data'] = substr($parsedFrame['data'], $frame_terminatorpos + strlen($this->TextEncodingTerminatorLookup($frame_textencoding)));
 			if (!empty($parsedFrame['framenameshort']) && !empty($parsedFrame['data'])) {
-				$ThisFileInfo['id3v2']['comments'][$parsedFrame['framenameshort']][] = trim(getid3_lib::iconv_fallback($parsedFrame['encoding'], $ThisFileInfo['id3v2']['encoding'], $parsedFrame['data']));
+				$ThisFileInfo['id3v2']['comments'][$parsedFrame['framenameshort']][$parsedFrame['description']] = trim(getid3_lib::iconv_fallback($parsedFrame['encoding'], $ThisFileInfo['id3v2']['encoding'], $parsedFrame['data']));
 			}
 			unset($parsedFrame['data']);
 
@@ -661,10 +661,15 @@ class getid3_id3v2
 
 				// remove possible terminating \x00 (put by encoding id or software bug)
 				$string = getid3_lib::iconv_fallback($parsedFrame['encoding'], $ThisFileInfo['id3v2']['encoding'], $parsedFrame['data']);
+        
 				if ($string[strlen($string) - 1] == "\x00") {
 					$string = substr($string, 0, strlen($string) - 1);
 				}
-				$ThisFileInfo['id3v2']['comments'][$parsedFrame['framenameshort']][] = $string;
+        $strings = preg_split('`\x00`', $string, -1, PREG_SPLIT_NO_EMPTY);
+        
+        foreach($strings as $s){
+  				$ThisFileInfo['id3v2']['comments'][$parsedFrame['framenameshort']][] = $s;
+        }
 				unset($string);
 			}
 
@@ -724,10 +729,26 @@ class getid3_id3v2
 			// described in 4.3.2.>
 			// URL              <text string>
 
-			$parsedFrame['url'] = trim($parsedFrame['data']);
+			$string = trim($parsedFrame['data']);
+      //$parsedFrame['url']
+      
+      if ($string[strlen($string) - 1] == "\x00") {
+        $string = substr($string, 0, strlen($string) - 1);
+      }
+      $strings = preg_split('`\x00`', $string, -1, PREG_SPLIT_NO_EMPTY);
+        
+      foreach($strings as $s){
+        $ThisFileInfo['id3v2']['comments'][$parsedFrame['framenameshort']][] = $s;
+      }
+      
+      /*
+			$parsedFrame['url'] = $string = trim($parsedFrame['data']);
+      //
 			if (!empty($parsedFrame['framenameshort']) && $parsedFrame['url']) {
 				$ThisFileInfo['id3v2']['comments'][$parsedFrame['framenameshort']][] = $parsedFrame['url'];
 			}
+       * 
+       */
 			unset($parsedFrame['data']);
 
 
@@ -1236,7 +1257,7 @@ class getid3_id3v2
 				$frame_imagetype = substr($parsedFrame['data'], $frame_offset, 3);
 				if (strtolower($frame_imagetype) == 'ima') {
 					// complete hack for mp3Rage (www.chaoticsoftware.com) that puts ID3v2.3-formatted
-					// MIME type instead of 3-char ID3v2.2-format image type  (thanks xbhoffØpacbell*net)
+					// MIME type instead of 3-char ID3v2.2-format image type  (thanks xbhoffï¿½pacbell*net)
 					$frame_terminatorpos = strpos($parsedFrame['data'], "\x00", $frame_offset);
 					$frame_mimetype = substr($parsedFrame['data'], $frame_offset, $frame_terminatorpos - $frame_offset);
 					if (ord($frame_mimetype) === 0) {
@@ -1378,9 +1399,15 @@ class getid3_id3v2
 			}
 			$frame_offset = $frame_terminatorpos + strlen("\x00");
 			$frame_rating = ord(substr($parsedFrame['data'], $frame_offset++, 1));
-			$parsedFrame['data'] = getid3_lib::BigEndian2Int(substr($parsedFrame['data'], $frame_offset));
+			$parsedFrame['counter'] = getid3_lib::BigEndian2Int(substr($parsedFrame['data'], $frame_offset));
 			$parsedFrame['email']  = $frame_emailaddress;
 			$parsedFrame['rating'] = $frame_rating;
+      
+      $popm = array('email'=>$parsedFrame['email'], 'rating'=>(int)$parsedFrame['rating'], 'counter'=>(int)$parsedFrame['counter']);
+      
+      $ThisFileInfo['id3v2']['comments'][$parsedFrame['framenameshort']][] = $popm;
+    
+      
 			unset($parsedFrame['data']);
 
 
@@ -2151,7 +2178,7 @@ class getid3_id3v2
 			SOS	Somalia
 			SPL	Seborga
 			SRG	Suriname
-			STD	São Tome and Principe
+			STD	Sï¿½o Tome and Principe
 			SVC	El Salvador
 			SYP	Syria
 			SZL	Swaziland
@@ -2175,13 +2202,13 @@ class getid3_id3v2
 			VND	Viet Nam
 			VUV	Vanuatu
 			WST	Samoa
-			XAF	Communauté Financière Africaine
+			XAF	Communautï¿½ Financiï¿½re Africaine
 			XAG	Silver
 			XAU	Gold
 			XCD	East Caribbean
 			XDR	International Monetary Fund
 			XPD	Palladium
-			XPF	Comptoirs Français du Pacifique
+			XPF	Comptoirs Franï¿½ais du Pacifique
 			XPT	Platinum
 			YER	Yemen
 			YUM	Yugoslavia
@@ -2625,7 +2652,7 @@ class getid3_id3v2
 			vai	Vai
 			ven	Venda
 			vie	Vietnamese
-			vol	Volapük
+			vol	Volapï¿½k
 			vot	Votic
 			wak	Wakashan Languages
 			wal	Walamo
@@ -3103,7 +3130,7 @@ class getid3_id3v2
 			TT3	subtitle
 			TXT	lyricist
 			TXX	text
-			TXXX	text
+			TXXX	user_defined_text
 			TYE	year
 			TYER	year
 			UFI	unique_file_identifier

@@ -1173,9 +1173,9 @@ class getID3
 
 				foreach ($this->info[$comment_name]['comments'] as $tag_key => $valuearray) {
 					foreach ($valuearray as $key => $value) {
-						if (strlen(trim($value)) > 0) {
-							$this->info['tags'][trim($tag_name)][trim($tag_key)][] = $value; // do not trim!! Unicode characters will get mangled if trailing nulls are removed!
-						}
+            if (is_array($value) || strlen(trim($value)) > 0) {
+              $this->info['tags'][trim($tag_name)][trim($tag_key)][] = $value; // do not trim!! Unicode characters will get mangled if trailing nulls are removed!
+            }
 					}
 				}
 

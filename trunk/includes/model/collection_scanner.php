@@ -2,10 +2,10 @@
 
 require_once APP_LIB . 'System/Daemon.php';
 define('COLLECTION_SCANNER_STATUS_COMPLETE', 0);
-define('COLLECTION_SCANNER_STATUS_INIT', 1);
-define('COLLECTION_SCANNER_STATUS_INIT_SCANNED', 2);
-
-define('COLLECTION_SCANNER_STATUS_CLEANUP', 5);
+define('COLLECTION_SCANNER_STATUS_INIT', 5);
+define('COLLECTION_SCANNER_STATUS_INIT_SCANNED', 10);
+define('COLLECTION_SCANNER_STATUS_PARSE_FILES', 15);
+define('COLLECTION_SCANNER_STATUS_CLEANUP', 50);
 
 
 class collection_scanner {
@@ -17,7 +17,7 @@ class collection_scanner {
   static $image_filter = array('jpg', 'jpeg', 'gif', 'png', 'xcf', 'bmp');
   
   static function settings(){
-    self::$settings = db::settings('SELECT * FROM collection_scanner_settings');
+    self::$settings = db::settings('SELECT * FROM settings_collection_scanner');
     if(!self::$running){
       System_Daemon::setOptions(self::daemon_options());
     }
@@ -28,7 +28,7 @@ class collection_scanner {
   
   static function save_setting($name, $value){
     self::$settings[$name] = $value;
-    return db::exec('INSERT INTO collection_scanner_settings (name, value) VALUES(?,?) ON DUPLICATE KEY UPDATE value=?', array($name, $value, $value));
+    return db::exec('INSERT INTO settings_collection_scanner (name, value) VALUES(?,?) ON DUPLICATE KEY UPDATE value=?', array($name, $value, $value));
   }
 
   static function menu() {
@@ -88,6 +88,10 @@ class collection_scanner {
         break;
       case(COLLECTION_SCANNER_STATUS_INIT_SCANNED):
         self::scan_modified_directories();
+        $new_status = COLLECTION_SCANNER_STATUS_PARSE_FILES;
+        break;
+      case(COLLECTION_SCANNER_STATUS_PARSE_FILES):
+        self::parse_modified_files();
         $new_status = COLLECTION_SCANNER_STATUS_CLEANUP;
         break;
       case(COLLECTION_SCANNER_STATUS_CLEANUP):
@@ -102,49 +106,44 @@ class collection_scanner {
     return $new_status;
   }
   
-  static function scan_modified_directories(){
-    require_once APP_LIB . 'getid3/getid3/getid3.php';
-    $dirs = db::vals('SELECT name FROM dirs WHERE lastmod > prev_scan');      
-    System_Daemon::info('scan_modified_directories: %s', count($dirs));
-    $i = 0;
+  
+  function parse_modified_files(){
+    $tracks = db::query('SELECT track_id,track_path FROM tracks WHERE last_mod > prev_scan');
+    if(count($tracks) > 0){
+      require_once APP_MODEL . 'track_saver.php';
+      $i = 0;
+      foreach($tracks as $t){
+        track_saver::update_from_file($t['track_id'], $t['track_path']);
+        db::exec('UPDATE tracks SET prev_scan = ? WHERE track_id = ?', array((int)self::$settings['id'], (int)$t['track_id']));
+      }
+    }
     
-    $getID3 = new getID3;
+  }
+  
+  
+  
+  
+  
+  static function scan_modified_directories(){
+    $dirs = db::vals('SELECT name FROM dirs WHERE last_mod > prev_scan');      
+    System_Daemon::info('scan_modified_directories: %s', count($dirs));
     
     foreach($dirs as $d){
-      $info = self::scan_directory($d);  
-      
-      $empty = count($info['songs']);
-      
-      foreach($info['songs'] as $s){
-        
-        System_Daemon::info('PARSE: %s', $s);
-        $data = $getID3->analyze($s);
-        //getid3_lib::CopyTagsToComments($data);
-        
-        foreach($data as $k=>$v){
-          System_Daemon::info('KEY: %s', $k);
-          if('comments_html' == $k){
-            foreach($v as $c=>$f){
-              System_Daemon::info('COMMENT(%s): %s', $c, $f);
-            }
-            
-          }elseif('id3v2' == $k){
-            foreach($v as $c=>$f){
-              System_Daemon::info('id3v2 [%s]: %s', $c, $f);
-            }
-         
-          }else{
-            System_Daemon::info('VALUE: %s', $v);
-          }
-        }
-        
-      }
-      
-      db::exec('UPDATE dirs SET prev_scan = ? WHERE name = ?', array($empty, $directory));
-      
-      if($i++ > 3){
-        break;
-      }
+      self::update_tracks(self::scan_directory($d));  
+      db::exec('UPDATE dirs SET prev_scan = ? WHERE name = ?', array((int)self::$settings['id'], $d));
+    }
+  }
+  
+  
+  
+  static function update_tracks($directory){     
+    //System_Daemon::info('update_tracks: %s', count($info['songs']));
+    
+    /* take images from directory and insert, then associate song with image */
+    
+    foreach($directory['songs'] as $track_path => $last_mod){
+        db::exec('INSERT INTO tracks (track_path, last_mod, scan_id, track_added) VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE last_mod=?, scan_id=?',
+          array($track_path, (int)$last_mod, (int)self::$settings['id'], (int)self::$settings['id'], (int)$last_mod, (int)self::$settings['id']) );
     }
     
   }
@@ -164,11 +163,11 @@ class collection_scanner {
               $extension = strtolower(end(explode('.', $file)));
               
               if ('' == $extension || in_array($extension, self::$song_filter)) {
-                $info['songs'][] = $path;
+                $info['songs'][$path] = filemtime($path);
               }elseif(in_array($extension, self::$image_filter)) {   
-                $info['images'][] = $path;
+                $info['images'][$path] = filemtime($path);
               }else{    
-                db::exec('INSERT INTO other_files (path) values(?)', $path);
+                db::exec('INSERT INTO xdev_other_files (path) values(?)', $path);
               }
           }
         }
@@ -215,7 +214,7 @@ class collection_scanner {
               if ('' == $extension || in_array($extension, self::$song_filter)) {
                 $mp3_count++;
               }else if(!in_array($extension, self::$image_filter)){
-                db::exec('INSERT INTO extensions (name) VALUES (?)', $extension);
+                db::exec('INSERT INTO xdev_extensions (name) VALUES (?)', $extension);
               }
             }
           }
@@ -226,7 +225,7 @@ class collection_scanner {
       
       if($count > 0 && $mp3_count > 0){
         $m = filemtime($directory);
-        db::exec('INSERT INTO dirs (name,lastmod,scan_id) VALUES(?,?,?) ON DUPLICATE KEY UPDATE lastmod=?, scan_id=?',
+        db::exec('INSERT INTO dirs (name,last_mod,scan_id) VALUES(?,?,?) ON DUPLICATE KEY UPDATE last_mod=?, scan_id=?',
           array($directory, (int)$m, (int)self::$settings['id'], (int)$m, (int)self::$settings['id']) );
   
       }else if(0==$count){

@@ -12,7 +12,7 @@ class app {
     $path = app::next();
     $path = empty($path) ? 'main' : $path;
     $cname = "{$path}_controller";
-    $controller = new $cname();
+    $controller = new $cname;
     $controller->control();
   }
 

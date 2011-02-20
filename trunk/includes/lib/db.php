@@ -24,16 +24,25 @@ class db {
     return self::$con;
   }
 
-  static function exec($sql, $p = null, $data_source=null) {
+  static function exec($sql, $p = null, $data_source=null,$debug=false) {
     self::connect($data_source);
 
     if (is_null($p)) {
       $count = self::$con->exec($sql);
+
     } else {
+      
       self::$s = self::$con->prepare($sql);
-      self::bind($p);
+      $r = self::bind($p);
       $count = self::$s->execute();
+      if($debug){
+        
+        System_Daemon::info('DB INFO: %s', var_export(self::$con->errorInfo(),true));
+        //System_Daemon::info('DB INFO: %s', var_export(self::$s,true));
+      }
+      
     }
+    
     return $count;
   }
 

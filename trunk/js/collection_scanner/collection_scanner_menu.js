@@ -10,6 +10,6 @@ function start_scanning(){
 
 function scanning_started(j){
   for(i in j){
-    alert(i + ':' + j[i]);
+    //alert(i + ':' + j[i]);
   }
 }
