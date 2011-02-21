@@ -1,11 +1,16 @@
 <?php
-  $start = (int)rand(0,222);
-  $songs = amarok::get($start,422);
-  $merged = array();
-  $i=0;
-  $r = current($songs);
-  $r = substr($r['url'],1);
-
-	$app->css('playlist.css');
-	$app->js('playlist.js');
-  include $app['view'] . 'playlist.php';
+ 
+class playlist_controller extends controller{
+  function __construct(){
+    
+  }
+  function control(){
+    switch(app::next()){
+      default:
+        
+        $popm_default = settings::val('popm_email_default');
+        print $popm_default;
+        break;
+    }
+  }
+}

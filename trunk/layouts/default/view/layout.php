@@ -15,12 +15,12 @@
   <script type="text/javascript" src="<?=APP_HOME_JS?>app.js"></script>
 </head>
 <body id="page-body">
-  <div id="layout-header" class="ui-layout-north">north</div>
-  <div id="layout-footer" class="ui-layout-south">south</div>
+  <div id="layout-header" class="ui-layout-north">Loading...</div>
+  <div id="layout-footer" class="ui-layout-south">Loading...</div>
   <div id="navigation-helper" class="ui-layout-east">
     <div id="app-logger"></div>
   </div>
-  <div id="application-navigation" class="ui-layout-west">west</div>
-  <div id="layout-playlist" class="ui-layout-center">center</div>
+  <div id="application-navigation" class="ui-layout-west">Loading...</div>
+  <div id="layout-playlist" class="ui-layout-center">Loading...</div>
 </body>
 </html>

@@ -16,25 +16,10 @@ body {
 	line-height: 1em;
 }
 
-.main-menu{
-	background: #333 url(<?=APP_HOME_LAYOUT?>images/main-menu-bg.png) repeat-x;
-	color: #fff;
-  text-shadow: 0px -1px 0px #000;
-  padding: 0px;
+
+a, a:visited{
+  color: #333;
 }
-.main-menu li{
-	background: #333 url(<?=APP_HOME_LAYOUT?>images/main-menu-bg.png) repeat-x;
-	border-right: 1px solid #333;
-	cursor: pointer;
-	float: left;
-	padding: 0px 10px;
-  line-height: 20px;
-}
-.main-menu li:hover{
-	background-color: #2a2a2a;
-}
-.main-menu li:active{
-	background-color: #fef;
-	color: #838;
-  text-shadow: 0px -1px 0px #535;
+a:hover{
+  color: #600;
 }

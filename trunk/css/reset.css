@@ -24,3 +24,7 @@ blockquote {
 .clear-both{
   clear: both;
 }
+input[type=text]{
+   -webkit-user-select: text;
+   -moz-user-select: text;
+}

@@ -180,7 +180,8 @@ class collection_scanner {
   
   
   static function begin_collection_scanning(){
-    foreach(self::$settings['directories'] as $d){
+    foreach(self::$settings['directories'] as $d){   
+      System_Daemon::info('SCAN REC DIR 4 Changes: %s', $d);
       self::scan_directory_recursively($d);
     }
     db::exec('DELETE FROM dirs WHERE scan_id <> ?', (int)self::$settings['id']);
@@ -190,6 +191,7 @@ class collection_scanner {
   function scan_directory_recursively($directory) {
     $count = -1;
     $mp3_count = 0;
+    $max_mod = 0;
     
     $dir = false;
     if (substr($directory, -1) == '/') {
@@ -210,12 +212,18 @@ class collection_scanner {
               self::scan_directory_recursively($path);
             }elseif(is_file($path)){
               $extension = strtolower(end(explode('.', $file)));
-              
-              if ('' == $extension || in_array($extension, self::$song_filter)) {
+              if (empty($extension) || in_array($extension, self::$song_filter)) {
                 $mp3_count++;
-              }else if(!in_array($extension, self::$image_filter)){
-                db::exec('INSERT INTO xdev_extensions (name) VALUES (?)', $extension);
+                $mf = filemtime($path);
+                $max_mod = $mf > $max_mod ? $mf : $max_mod;
               }
+              /*
+               * else if(!in_array($extension, self::$image_filter)){
+               
+                //db::exec('INSERT INTO xdev_extensions (name) VALUES (?)', $extension);
+              }
+               * 
+               */
             }
           }
         }
@@ -223,14 +231,15 @@ class collection_scanner {
       
       closedir($directory_list);
       
-      if($count > 0 && $mp3_count > 0){
-        $m = filemtime($directory);
+      if($mp3_count > 0){
+        //$m = filemtime($directory);
+        $m = $max_mod;
         db::exec('INSERT INTO dirs (name,last_mod,scan_id) VALUES(?,?,?) ON DUPLICATE KEY UPDATE last_mod=?, scan_id=?',
           array($directory, (int)$m, (int)self::$settings['id'], (int)$m, (int)self::$settings['id']) );
   
       }else if(0==$count){
         // delete $directory
-        //System_Daemon::info('DELETE DIR: %s', $directory);
+        // System_Daemon::info('DELETE DIR: %s', $directory);
       }
       
     }

@@ -24,14 +24,21 @@ var main_layout_options = {
     
   },
   west: {
-    resizable: false
+    resizable: false,
+    onresize : layout_west_panel_resized
   },
   east: {
     //initClosed: true
   },
   south: {
     size: 30,
-    resizable: false,
+    resizable: true,
     initClosed: true
   }
 };
+
+
+function layout_west_panel_resized(){
+  $('#application-navigation').trigger('west_resized');
+  return true;
+}

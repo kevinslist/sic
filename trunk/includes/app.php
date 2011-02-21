@@ -94,7 +94,8 @@ class app {
 
       $ck = explode("/", $t);
       foreach ($ck as $k) {
-        if (!empty($k)) {
+        $k = trim($k);
+        if ('' !== $k) {
           array_push(self::$args, $k);
         }
       }
