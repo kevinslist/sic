@@ -21,6 +21,7 @@ var main_layout_options = {
   },
   center: {
     //onresize: center_resized
+    onresize : layout_center_panel_resized
     
   },
   west: {
@@ -40,5 +41,9 @@ var main_layout_options = {
 
 function layout_west_panel_resized(){
   $('#application-navigation').trigger('west_resized');
+  return true;
+}
+function layout_center_panel_resized(){
+  $('#layout-playlist').trigger('center_resized');
   return true;
 }

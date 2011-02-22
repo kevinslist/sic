@@ -3,23 +3,22 @@
   overflow: hidden;
 }
 #navigation-tabs .tabs-list{
-  background-color: #ddd;
-  border-bottom: 1px solid #ccc;
-  border-right: 1px solid #ccc;
+  background-color: #eee;
 }
 #navigation-tabs .tabs-list li a{
-  padding: 0px 4px 3px 4px;
-  border-right: 1px solid #ccc;
+  border-right: 1px solid #e0e0e0;
   display: block;
+  height: 20px;
+  line-height: 23px;
+  padding: 0px 8px;
 }
 #navigation-tabs .tabs-list li a:hover{
   background-color: #fff;
 }
 
 #collection-tab .search-bar{
-  background-color: #e3e3e3;
-  border-right: 1px solid #ccc;
-  border-bottom: 1px solid #ddd;
+  background-color: #eee;
+  border-bottom: 1px solid #ccc;
   padding: 2px 0px;
 }
 #collection-tab .search-bar #collection-search{

@@ -1,19 +1,35 @@
 var home = '/';
-var tracks = null;
+var tracks = new Object();
+var track_total = 0;
 
+var playlist_loaded = 0;
+var thread_count = 3; // 6 @ 900
 $(function(){
+  /*
   //$('#layout-footer').load(home+'footer');
-
-  setTimeout("$.getJSON(home+'tracks/all', tracks_loaded)", 5);
-  applog('page-load: ' + home);
+  start = 0;
+  end   = 0;
+  for(i=0;i<thread_count;i++){
+    setTimeout("$.getJSON(home+'tracks/all/" + i + "', tracks_loaded);", 20 + ((i) * 300));
+  }
+  */
+  $('#layout-playlist').load(home+'playlist');
   $('#application-navigation').load(home+'navigation');
   $('#layout-header').load(home+'header');
 });
 
 function tracks_loaded(data){
-  applog('tracks loaded: ' + data.length);
-  tracks = data;
-  $('#layout-playlist').load(home+'playlist');
+  playlist_loaded++;
+  track_total += data.length;
+  applog('tracks loaded(' + playlist_loaded + '): ' + data.length);
+  //tracks = data;
+  if(playlist_loaded == thread_count){
+    setTimeout("$('#layout-playlist').load(home+'playlist');", 10);
+    applog('track_total: ' + track_total);
+  }
+  for(i in data){
+    tracks[i] = data[i];
+  }
 }
 
 function applog(mess){

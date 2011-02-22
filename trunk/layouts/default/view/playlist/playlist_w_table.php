@@ -22,18 +22,19 @@
     <table class="playlist-table" cellspacing="0">
       <tbody>
         <?php
-        foreach ($songs as $s) {
-          $i++;
-          $c = $i % 2 ? 'o' : 'e';
-          print '<tr class="' . $c . '"><td class="title-column"><span>' . $s['title'] . '</span></td>';
-          print '<td class="artist-column"><span>' . $s['artist'] . '</span></td>';
-          print '<td class="album-column"><span>' . $s['album'] . '</span></td>';
-          print '<td class="comment-column"><span>' . $s['comment'] . '</span></td>';
+        $songs = array();
+        for($j=0;$j<40;$j++) {
+          $c = $j % 2 ? 'o' : 'e';
+          print '<tr class="' . $c . '"><td class="title-column"><span>&nbsp;</span></td>';
+          print '<td class="artist-column"><span>&nbsp;</span></td>';
+          print '<td class="album-column"><span>&nbsp;</span></td>';
+          print '<td class="comment-column"><span>&nbsp;</span></td>';
 
-          print '<td class="rating-column"><span>' . $s['rating'] . '</span></td></tr>';
+          print '<td class="rating-column"><span>&nbsp;</span></td></tr>';
         }
         ?>
       </tbody>
     </table>
+    <div id="playlist-padder"></div>
   </div>
 </div>

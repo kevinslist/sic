@@ -21,7 +21,7 @@ ul,li{
 blockquote {
   margin-left: 40px;
 }
-.clear-both{
+.clear,.clear-both{
   clear: both;
 }
 input[type=text]{
