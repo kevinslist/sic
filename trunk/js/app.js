@@ -16,6 +16,7 @@ $(function(){
   $('#layout-playlist').load(home+'playlist');
   $('#application-navigation').load(home+'navigation');
   $('#layout-header').load(home+'header');
+ 
 });
 
 function tracks_loaded(data){
@@ -42,6 +43,7 @@ function execute_action(action){
     
   
 }
+
 
 
 function var_export (mixed_expression, bool_return) {

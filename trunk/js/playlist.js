@@ -9,17 +9,13 @@ $(function(){
   
   $( "#playlist-body div.col").dblclick(track_double_clicked);
   $( "#playlist-body div.col").click(track_col_clicked);
+  
 });
 
 function check_single_click(){
   if(track_slow_dbl.track_id){
-    var row = $('#playlist-body > div.track[data-track-id=' + track_slow_dbl.track_id + ']');
-    var selected = $(row).hasClass('ui-selected');
-    $('#playlist-body > div.track').removeClass('ui-selected');
-    $(row).toggleClass('ui-selected', !selected);
-    applog('single-click:' + track_slow_dbl.track_id);
-    track_slow_dbl.track_id   = false;
-    track_slow_dbl.click_time = 0;
+    applog('slow--click:' + track_slow_dbl.track_id);
+    set_track_selected();
   }
 }
 
@@ -28,7 +24,6 @@ function track_col_clicked(){
   var ct  = new Date().getTime();
   if(tid == track_slow_dbl.track_id && (ct - track_slow_dbl.click_time > 300) && (ct - track_slow_dbl.click_time < 600)){
     applog('slow--click:' + $(this).parent().attr('data-track-id'));
-    
     track_slow_dbl.track_id   = false;
     track_slow_dbl.click_time = 0;
   }else{
@@ -39,10 +34,21 @@ function track_col_clicked(){
 }
 
 function track_double_clicked(){
-  track_slow_dbl.track_id = false;
-  track_slow_dbl.click_time = 0;
+  set_track_selected();
   applog('dclicked:' + $(this).parent().attr('data-track-id'));
   return false;
+}
+
+function set_track_selected(){
+  var track_id = track_slow_dbl.track_id;
+  var row = $('#playlist-body > div.track[data-track-id=' + track_id + ']');
+  var selected = $(row).hasClass('ui-selected');
+  $('#playlist-body > div.track').removeClass('ui-selected');
+  $(row).toggleClass('ui-selected', !selected);
+  //applog('single-click:' + track_slow_dbl.track_id);
+  track_slow_dbl.track_id   = false;
+  track_slow_dbl.click_time = 0;
+  $.get(home + 'player/goto/' + track_id);
 }
 
 function resize_playlist_area(){
@@ -53,7 +59,7 @@ function resize_playlist_area(){
   $('#playlist-body-wrapper').height( new_height);
   var pw = $('#playlist-scrollbar-fix').width();
   
-  var rating_column = 60;
+  var rating_column = 50;
   var currently_playing_column = 18;
   pw = (pw - rating_column) - currently_playing_column;
   
