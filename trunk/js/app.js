@@ -1,6 +1,7 @@
 var home = '/';
 var tracks = new Object();
 var track_total = 0;
+var sic_socket = null;
 
 var playlist_loaded = 0;
 var thread_count = 3; // 6 @ 900
@@ -13,11 +14,55 @@ $(function(){
     setTimeout("$.getJSON(home+'tracks/all/" + i + "', tracks_loaded);", 20 + ((i) * 300));
   }
   */
+  $.getJSON(home + 'sic_socket/init', sic_socket_inited);
   $('#layout-playlist').load(home+'playlist');
   $('#application-navigation').load(home+'navigation');
   $('#layout-header').load(home+'header');
  
 });
+
+function sic_socket_message(e){
+  applog('websocket MESSAGE: ' + e.data);
+}
+
+function sic_socket_open(){
+  applog('websocket OPEN!');
+  sic_socket_send('hello');
+}
+
+function sic_socket_closed(){
+  applog('websocket CLOSED!');
+  sic_socket = null;
+}
+
+function sic_socket_close(){
+  applog('websocket CLOSEING!');
+  if(sic_socket){
+    sic_socket.close();
+  }
+}
+function sic_socket_send(txt){
+  msg = $.trim(txt);
+   if(!sic_socket){
+    applog('sicsock closed can"t send');
+  }else if(msg){ 
+    try{
+      sic_socket.send(msg); 
+      applog('websocket SEND: '+ msg); 
+    }catch(ex){
+      applog(ex); 
+    }
+  }
+}
+
+function sic_socket_inited(data){
+  applog( var_export(data,true));
+  sic_socket = new WebSocket("ws://127.0.0.1:12345/");
+  sic_socket.onopen = sic_socket_open;
+  sic_socket.onmessage = sic_socket_message;
+  sic_socket.onclose = sic_socket_closed;
+  $(window).unload(sic_socket_close);
+}
 
 function tracks_loaded(data){
   playlist_loaded++;

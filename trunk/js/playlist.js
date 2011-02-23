@@ -15,6 +15,7 @@ $(function(){
 function check_single_click(){
   if(track_slow_dbl.track_id){
     applog('slow--click:' + track_slow_dbl.track_id);
+    sic_socket_send(track_slow_dbl.track_id);
     set_track_selected();
   }
 }

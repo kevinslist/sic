@@ -10,6 +10,7 @@
   <script type="text/javascript" src="<?=APP_HOME?>js/jquery/jquery.js"></script>
   <script type="text/javascript" src="<?=APP_HOME?>js/jquery/jquery.ui.js"></script>
   <script type="text/javascript" src="<?=APP_HOME?>js/jquery/jquery.cookie.js"></script>
+  <script type="text/javascript" src="<?=APP_HOME?>js/jquery/jquery.websocket.js"></script>
   <script type="text/javascript" src="<?=APP_HOME?>js/jquery/jquery.layout.js"></script>
   <script type="text/javascript" src="<?=APP_HOME_LAYOUT?>js/layout.js"></script>
   <script type="text/javascript" src="<?=APP_HOME_JS?>app.js"></script>

@@ -2,7 +2,7 @@
 
 require_once APP_LIB . 'System/Daemon.php';
 define('MPLAYER_CONTROL_FILE', '/home/www/music/out/player/control');
-
+// cvlc --rc-host localhost:12344
 class mplayer{
   static $running = false;
   static $data = array();
