@@ -4,11 +4,64 @@ require_once APP_LIB . 'System/Daemon.php';
 require_once APP_LIB . 'websocket.class.php';
 define('SIC_SOCKET_SLUG', 'sic_socket');
 
-class sic_socket{
+class sic_socket extends WebSocket{
   static $running = false;
   static $data = array();
   static $settings = array();
-  static $master = null;
+  
+  function update_status(){
+    //player::get_status();
+    //System_Daemon::info('update_status');
+    $this->broadcast( array('action'=>'status') );
+  }
+  
+  function quit(){
+    $this->do_quit = true;
+  }
+  
+  function process($user,$msg){
+    parse_str($msg);
+    if(isset($action)){
+      System_Daemon::info('PROCESS: %s', $action . '::' . $data);
+    
+      switch($action){
+        case('play'):
+          mplayer::play();
+          break;
+        case('quit'):
+          $this->quit();
+          $json = 'quit';
+          break;
+        case('track_info'):
+          //$track_id = (int)$m['text'];
+          $json = db::row('select * from tracks where track_id=?', (int)$data);
+          break;
+        default:
+          $json = 'default';
+          break;
+      }
+      $this->broadcast($json);
+    }else{
+      //System_Daemon::info('EMPTYREQUEST');
+    }
+  }
+  
+  function broadcast($data){
+    //System_Daemon::info('BROADCASt: ' . $msg);
+    
+    if(!empty($data)){
+      foreach($this->users as $user){
+        if($user->handshake && $user->socket){
+          //System_Daemon::info('SEND BAK: ' . json_encode($data));
+          $this->send($user->socket, json_encode($data) );
+        }
+      }
+    }
+    
+  }
+  
+  
+  
   
   static function settings(){
     self::$settings = array();
@@ -42,8 +95,7 @@ class sic_socket{
       self::close_output();
       
       System_Daemon::info('START SOCKET SERVER');
-      $master = new WebSocket("localhost",12345);
-   
+      $m = new sic_socket("localhost",12345);
       $te = time();
       $tt = $te - $ts;
       System_Daemon::info('TIME TOTAL: %s', $tt);
@@ -56,11 +108,11 @@ class sic_socket{
     return array();
   }
   
-  static function say($str){
+  function say($str){
     System_Daemon::info('SS_SAY:' . $str);
   }
-  static function log($str){
-    System_Daemon::info('SS_LOG:' . $str);
+  function log($str){
+    if($this->debug){ System_Daemon::info('SS_LOG:' . $str); }
   }
   
   static function close_output(){

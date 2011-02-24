@@ -7,7 +7,7 @@ class WebSocket{
   var $sockets = array();
   var $users   = array();
   var $debug   = false;
-  
+  var $do_quit = false;
   function __construct($address,$port){
     error_reporting(E_ALL);
     set_time_limit(0);
@@ -20,14 +20,15 @@ class WebSocket{
     $this->sockets[] = $this->master;
     $this->say("Server Started : ".date('Y-m-d H:i:s'));
     $this->say("Listening on   : ".$address." port ".$port);
-    $this->say("Master socket  : ".$this->master."\n");
-    $i = 0;
-    $t = time();
-    while(true){
-      $this->say('loop:'.$i++.':'. (time()-$t));
-      $changed = $this->sockets;
+    //$this->say("Master socket  : ".$this->master."\n");
+
+    while(true && !$this->do_quit){
+      $changed  = $this->sockets;
+      $got_data = false;
       socket_select($changed,$write=NULL,$except=NULL,1);  // sec, millsec
+      
       foreach($changed as $socket){
+        $got_data = true;
         if($socket==$this->master){
           $client=socket_accept($this->master);
           if($client<0){ $this->log("socket_accept() failed"); continue; }
@@ -41,32 +42,24 @@ class WebSocket{
             if(!$user->handshake){ $this->dohandshake($user,$buffer); }
             else{ 
               $this->process($user,$this->unwrap($buffer)); 
-             
             }
           }
         }
       }
+      if(!$got_data){
+        $this->update_status();
+      }
     }
   }
 
+  function update_status(){
+    return true;
+  }
   function process($user,$msg){
-    /* Extend and modify this method to suit your needs */
-    /* Basic usage is to echo incoming messages back to client */
-    
-    $tid = (int)$msg;
-    if($tid > 0){
-      $msg = var_export(db::row('select * from tracks where track_id=?', $tid),true);
-    }
-    
-    foreach($this->users as $user){
-      $this->send($user->socket,$msg);
-      //if($user->socket==$socket){ $found=$user; break; }
-    }
-    // $this->send($user->socket,$msg);
+    $this->send($user->socket,$msg);
   }
 
   function send($client,$msg){
-
     $msg = $this->wrap($msg);
     socket_write($client,$msg,strlen($msg));
   }
@@ -113,7 +106,7 @@ class WebSocket{
                 "\r\n" .
                     $this->calcKey($key1,$key2,$l8b) . "\r\n";// .
                         //"\r\n";
-    socket_write($user->socket,$upgrade.chr(0),strlen($upgrade.chr(0)));
+    socket_write($user->socket,$upgrade.chr(0).chr(255),strlen($upgrade)+2);
     $user->handshake=true;
     $this->log($upgrade);
     $this->log("Done handshaking...");
@@ -160,10 +153,11 @@ class WebSocket{
     return $found;
   }
 
-  function     say($msg=""){ sic_socket::say( $msg ); }
-  function     log($msg=""){ if($this->debug){ sic_socket::log( $msg) ; } }
   function    wrap($msg=""){ return chr(0).$msg.chr(255); }
-  function  unwrap($msg=""){ return substr($msg,1,strlen($msg)-2); }
+  function  unwrap($msg=""){ 
+    return substr($msg,1,strlen($msg)-2); 
+    
+ }
 
 }
 

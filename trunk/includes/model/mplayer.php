@@ -3,20 +3,15 @@
 require_once APP_LIB . 'System/Daemon.php';
 define('MPLAYER_CONTROL_FILE', '/home/www/music/out/player/control');
 // cvlc --rc-host localhost:12344
+
 class mplayer{
   static $running = false;
   static $data = array();
   static $settings = array();
+  static $cport   = 12346;
   
-  static function pause(){
-   // print "FPC: " . file_put_contents(MPLAYER_CONTROL_FILE, "pause\n");
-    
-    $fifo = fopen(MPLAYER_CONTROL_FILE, 'w+'); 
-    var_export($fifo);
-    fwrite($fifo, "pause\n");
-    fclose ($fifo);
-    
-    return array('track_id'=>'pause');
+  static function play(){
+    return $output;
   }
   static function seek(){
    // print "FPC: " . file_put_contents(MPLAYER_CONTROL_FILE, "pause\n");
@@ -30,7 +25,7 @@ class mplayer{
   static function start($tid){
     System_Daemon::setOptions(self::daemon_options());
     if(!System_Daemon::isRunning()){
-      $command = 'php ' . APP_SCRIPTS . 'mplayer_start.php ' . $tid;
+      $command = 'php ' . APP_SCRIPTS . 'mplayer_start.php';
       shell_exec($command); 
     }
     return array('track_id'=>$tid);
@@ -50,44 +45,18 @@ class mplayer{
       self::$running = true;
       self::close_output();
       
-      System_Daemon::info('TRACK ID: %s',$track_id);
-      $r = db::row('SELECT * FROM tracks WHERE track_id = ?', (int)$track_id);
-      System_Daemon::info('TRACK PATH: %s', $r['track_path']);
+      System_Daemon::info('START VLC');
       
-      $control = '/home/www/music/out/player/control';
-      // $control = '/tmp/control';
-      // $fh=fopen($control, "r+"); 
-      // stream_set_blocking($fh, false);
-      if(file_exists(MPLAYER_CONTROL_FILE)){
-        unlink(MPLAYER_CONTROL_FILE);
-      }
-      umask(0);
-      $mkfifo = posix_mkfifo(MPLAYER_CONTROL_FILE, 0600); 
-      System_Daemon::info('sukMkFIFO: %s', $mkfifo);
-      
-      $command = 'mplayer -slave -input file=' . MPLAYER_CONTROL_FILE . ' "' . $r['track_path'] . '" > /tmp/kbmplayerout 2>&1 &'; 
-      // -v -quiet 
-      //// 2>&1 redirect errors to stdout
-      // & don't wait
-      //-really-quiet -slave 
-      System_Daemon::info('COMMAND: %s', $command);
-      
+      $command = 'cvlc --extraintf=rc --rc-host=localhost:' . self::$cport . ' -I dummy --rc-fake-tty >/var/www/vlc_out 2>&1 &';
+      //  -vvv
+      System_Daemon::info('VLC_B4: ' . $command);
       exec($command, $output); 
+      System_Daemon::info('VLC_AFTER: %s', var_export($output,true));
       
       $te = time();
       $tt = $te - $ts;
-      System_Daemon::info('COMMAND FINISHED: %s', $tt);
-      System_Daemon::info('OP: %s', var_export($output, true) );
+      System_Daemon::info('VLC_MPLAYER FINISHED: %s', $tt);
       $runningOkay = true;
-      self::seek();
-      
-      while (!System_Daemon::isDying() && $runningOkay) {
-        // What mode are we in?
-        // play next ?
-        $runningOkay = false; // check supin
-        System_Daemon::iterate(1);
-      }
-
       $te = time();
       $tt = $te - $ts;
       System_Daemon::info('TIME TOTAL: %s', $tt);

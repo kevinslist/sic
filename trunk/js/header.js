@@ -6,16 +6,19 @@ $(function(){
 
 function header_menu_clicked(){
   
-  var menuid = $(this).attr('data-menuid');
-  switch(menuid){
-    case('collection_scanner'):
+  var tab = $(this).attr('id');
+  switch(tab){
+    case('collection-scan-tab'):
       new_window = window.open(home + 'collection_scanner/menu','collection-scanner-menu','scrollbars=no,resizable=no,toolbar=no,location=no,width=400,height=200');
       new_window.moveTo( (screen.width / 2 - 200), (screen.height / 2 - 100));
       new_window.focus();
       break;
+    case('quit-tab'):
+       applog('QUIT TAB:'+tab);
+       sic_socket_send('quit', 'quit');
+      break;
     default:
-       alert(menuid);
-      // do nothing
+       applog('MENUTABCLICKED:'+tab);
       break;
   }
   

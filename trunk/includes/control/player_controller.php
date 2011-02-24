@@ -10,11 +10,11 @@ class player_controller extends controller{
     switch($slug){
       case('pause'):
         print 'p1';
+        $track_id = (int)app::next();
         $this->view($slug, mplayer::pause());
         break;
-      case('goto'):
-        $track_id = (int)app::next();
-        $this->view($slug, mplayer::start($track_id));
+      case('start'):
+        $this->view($slug, mplayer::start());
         break;
       default:
         $this->view($slug, mplayer::menu($slug));

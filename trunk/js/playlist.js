@@ -2,11 +2,9 @@ var track_slow_dbl = new Object();
 
 $(function(){
   applog('play-izzle: ' + home);
-  applog('tracksss:');
   $('#layout-playlist').bind('center_resized', resize_playlist_area);
   resize_playlist_area();
   $( "#playlist-body" ).selectable({filter:'div.track', distance: 1 });
-  
   $( "#playlist-body div.col").dblclick(track_double_clicked);
   $( "#playlist-body div.col").click(track_col_clicked);
   
@@ -14,8 +12,9 @@ $(function(){
 
 function check_single_click(){
   if(track_slow_dbl.track_id){
-    applog('slow--click:' + track_slow_dbl.track_id);
-    sic_socket_send(track_slow_dbl.track_id);
+    applog('single-click:' + track_slow_dbl.track_id);
+    //sic_socket_send('track_info', track_slow_dbl.track_id);
+    //info for 1 window only
     set_track_selected();
   }
 }
@@ -27,16 +26,18 @@ function track_col_clicked(){
     applog('slow--click:' + $(this).parent().attr('data-track-id'));
     track_slow_dbl.track_id   = false;
     track_slow_dbl.click_time = 0;
+    return false;
   }else{
     setTimeout('check_single_click();', 605);
     track_slow_dbl.track_id   = tid;
     track_slow_dbl.click_time = ct;
+    return true;
   }
 }
 
 function track_double_clicked(){
+  //sic_socket_send('play',track_slow_dbl.track_id );
   set_track_selected();
-  applog('dclicked:' + $(this).parent().attr('data-track-id'));
   return false;
 }
 
@@ -49,7 +50,7 @@ function set_track_selected(){
   //applog('single-click:' + track_slow_dbl.track_id);
   track_slow_dbl.track_id   = false;
   track_slow_dbl.click_time = 0;
-  $.get(home + 'player/goto/' + track_id);
+  //$.get(home + 'player/goto/' + track_id);
 }
 
 function resize_playlist_area(){
@@ -70,8 +71,7 @@ function resize_playlist_area(){
   
   var comment_column = pw - (title_column + artist_column + album_column);
   rating_column = rating_column - 6;
-  
-  
+
   $('#playlist-wrapper .currently-playing-column').width(currently_playing_column);
   $('#playlist-wrapper .title-column').width(title_column);
   $('#playlist-wrapper .artist-column').width(artist_column);
@@ -79,5 +79,4 @@ function resize_playlist_area(){
   $('#playlist-wrapper .comment-column').width(comment_column);
   $('#playlist-wrapper .rating-column').width(rating_column);
   
-  applog('w:' + pw);
 }

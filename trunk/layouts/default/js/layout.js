@@ -16,7 +16,7 @@ var main_layout_options = {
   },
   north: {
     resizable: false,
-    size: 20,
+    size: 30,
     spacing_open: 0
   },
   center: {
