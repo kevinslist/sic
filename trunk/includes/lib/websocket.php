@@ -2,25 +2,26 @@
 
 // Usage: $master=new WebSocket("localhost",12345);
 
-class WebSocket{
+class websocket extends sic_process{
   var $master;
   var $sockets = array();
   var $users   = array();
   var $debug   = false;
   var $do_quit = false;
-  function __construct($address,$port){
-    error_reporting(E_ALL);
-    set_time_limit(0);
+  var $port = 420;
+  var $host = 'your-mama';
+  
+  function __construct(){}
+        
+  function start_server(){    
     ob_implicit_flush();
-
     $this->master=socket_create(AF_INET, SOCK_STREAM, SOL_TCP)     or die("socket_create() failed");
     socket_set_option($this->master, SOL_SOCKET, SO_REUSEADDR, 1)  or die("socket_option() failed");
-    socket_bind($this->master, $address, $port)                    or die("socket_bind() failed");
+    socket_bind($this->master, $this->host, $this->port)                    or die("socket_bind() failed");
     socket_listen($this->master,20)                                or die("socket_listen() failed");
     $this->sockets[] = $this->master;
-    $this->say("Server Started : ".date('Y-m-d H:i:s'));
-    $this->say("Listening on   : ".$address." port ".$port);
-    //$this->say("Master socket  : ".$this->master."\n");
+    $this->log("Server Started : ".date('Y-m-d H:i:s'));
+    $this->log("Listening on   : ". $this->host." port ". $this->port);
 
     while(true && !$this->do_quit){
       $changed  = $this->sockets;
@@ -62,6 +63,16 @@ class WebSocket{
   function send($client,$msg){
     $msg = $this->wrap($msg);
     socket_write($client,$msg,strlen($msg));
+  }
+  
+  function broadcast($data){
+    if(!empty($data)){
+      foreach($this->users as $user){
+        if($user->handshake && $user->socket){
+          $this->send($user->socket, $data );
+        }
+      }
+    }
   }
 
   function connect($socket){
@@ -156,8 +167,7 @@ class WebSocket{
   function    wrap($msg=""){ return chr(0).$msg.chr(255); }
   function  unwrap($msg=""){ 
     return substr($msg,1,strlen($msg)-2); 
-    
- }
+  }
 
 }
 

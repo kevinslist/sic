@@ -37,7 +37,7 @@ class db {
       $count = self::$s->execute();
       if($debug){
         
-        System_Daemon::info('DB INFO: %s', var_export(self::$con->errorInfo(),true));
+        var_export(self::$con->errorInfo());
         //System_Daemon::info('DB INFO: %s', var_export(self::$s,true));
       }
       

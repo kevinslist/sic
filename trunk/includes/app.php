@@ -60,36 +60,47 @@ class app {
     define('LAYOUT_CSS', APP_LAYOUTS . APP_LAYOUT . '/css/');
     define('LAYOUT_VIEW', APP_LAYOUTS . APP_LAYOUT . '/view/');
 
-    self::add_path(array(APP_MODEL, APP_VIEW, APP_CONTROL, APP_LIB));
+    $default_search_paths = array(APP_MODEL,APP_MODEL.'process/', APP_VIEW, APP_CONTROL, APP_LIB);
+    self::add_path($default_search_paths);
 
     if (isset($_SERVER["SERVER_NAME"])) {
+      
       define('APP_CRON', false);
       define('APP_HOME', preg_match('`/$`', dirname($_SERVER["PHP_SELF"])) ? dirname($_SERVER["PHP_SELF"]) : dirname($_SERVER["PHP_SELF"]) . "/");
 
-      define('APP_HOME_CSS', APP_HOME . 'css/');
-      define('APP_HOME_JS', APP_HOME . 'js/');
-      define('APP_HOME_IMAGES', APP_HOME . 'images/');
-      define('APP_HOME_LAYOUT', APP_HOME . 'layouts/' . APP_LAYOUT . '/');
-
-      self::parse_args();
     } else {
-      define('APP_CRON', false);
+      define('APP_CRON', true);
       define('APP_HOME', 'http://music/');
     }
+    
+    define('APP_HOME_CSS', APP_HOME . 'css/');
+    define('APP_HOME_JS', APP_HOME . 'js/');
+    define('APP_HOME_IMAGES', APP_HOME . 'images/');
+    define('APP_HOME_LAYOUT', APP_HOME . 'layouts/' . APP_LAYOUT . '/');
+    
+
+    self::parse_args();
     return true;
   }
 
   static function parse_args() {
-
+    global $argv;
     self::$args = array();
-    $regex = '`' . $_SERVER['DOCUMENT_ROOT'] . '/*`';
-    $subdir = preg_replace($regex, '', APP_WEBROOT);
-    $subdir = preg_replace('`/$`', '', $subdir);
-
-    $depth = empty($subdir) ? 0 : count(explode("/", $subdir));
-    $pre = '/' . (empty($subdir) ? '' : $subdir . '/');
-
-    if (preg_match('`([^?#]*)`', trim($_SERVER['REQUEST_URI']), $matches)) {
+    $dir    = isset($_SERVER['DOCUMENT_ROOT']) ? $_SERVER['DOCUMENT_ROOT'] : APP_WEBROOT;
+    $query  = isset($_SERVER['REQUEST_URI'])   ? $_SERVER['REQUEST_URI'] : $argv[1];
+    //$query  = isset($argv) && !empty($argv) ? $argv[1] : $_SERVER['REQUEST_URI'];
+    
+    if(isset($argv)){
+      $depth = 0;
+    }else{
+      $regex = '`' . $dir . '/*`';
+      $subdir = preg_replace($regex, '', APP_WEBROOT);
+      $subdir = preg_replace('`/$`', '', $subdir);
+      $depth = empty($subdir) ? 0 : count(explode("/", $subdir));
+      $pre = '/' . (empty($subdir) ? '' : $subdir . '/');
+    }
+    
+    if (preg_match('`([^?#]*)`', trim($query), $matches)) {
       $t = trim($matches[1]);
 
       $ck = explode("/", $t);
@@ -116,8 +127,9 @@ class app {
 
   public static function autoload($class) {
     foreach (self::$autoload_paths as $path) {
-      if (is_readable($path . DIRECTORY_SEPARATOR . $class . '.php')) {
-        require_once($path . DIRECTORY_SEPARATOR . $class . '.php');
+      $check_path = $path . DIRECTORY_SEPARATOR . $class . '.php';
+      if (is_readable($check_path)) {
+        require_once($check_path);
         return true;
       }
     }

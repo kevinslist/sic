@@ -14,8 +14,8 @@ $(function(){
     setTimeout("$.getJSON(home+'tracks/all/" + i + "', tracks_loaded);", 20 + ((i) * 300));
   }
   */
-  $.getJSON(home + 'sic_socket/init', sic_socket_inited);
-  $.get(home + 'player/start');
+  $.getJSON(home + 'process/start/sic_socket', sic_socket_inited);
+  //$.get(home + 'player/start');
   $('#layout-playlist').load(home+'playlist');
   $('#application-navigation').load(home+'navigation');
   $('#layout-header').load(home+'header');
