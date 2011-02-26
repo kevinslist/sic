@@ -30,6 +30,7 @@ var main_layout_options = {
   },
   east: {
     //initClosed: true
+    size: 900
   },
   south: {
     size: 30,

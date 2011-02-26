@@ -21,7 +21,7 @@ class track_search{
                       LEFT JOIN albums al ON tal.album_id = al.album_id
                       LEFT JOIN track_comments tc ON t.track_id = tc.track_id
                       LEFT JOIN track_popm tp ON t.track_id = tp.track_id AND tp.popm_email = ?
-                        WHERE a.artist_name LIKE "%noo%"
+                        WHERE a.artist_name_index LIKE "%layer%"
                         ORDER BY 
                           t.track_id, ta.track_artist_order, 
                           tal.track_album_order, tg.track_genre_order,

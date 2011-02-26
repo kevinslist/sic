@@ -15,7 +15,8 @@ $(function(){
   }
   */
   $.getJSON(home + 'process/start/sic_socket', sic_socket_inited);
-  //$.get(home + 'player/start');
+  $.getJSON(home + 'process/start/sic_player', sic_player_started);
+
   $('#layout-playlist').load(home+'playlist');
   $('#application-navigation').load(home+'navigation');
   $('#layout-header').load(home+'header');
@@ -28,7 +29,7 @@ function sic_socket_message(e){
     t = e.data;
     m = $.parseJSON(t);
     if(m){
-      if(m.action != 'status'){
+      if(m.action != 'player_status'){
         applog('wsM_ParsedSucc: ' + t);
       }
     }else{
@@ -73,6 +74,10 @@ function sic_socket_send(action, text){
   }else{
     applog('not obj');
   }
+}
+
+function sic_player_started(data){
+  applog('PLAYER STARTED: ' + data);
 }
 
 function sic_socket_inited(data){

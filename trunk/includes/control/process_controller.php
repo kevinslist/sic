@@ -9,6 +9,9 @@ class process_controller extends controller{
   function control(){
     $slug = app::next();
     switch($slug){
+      case('quit'):
+        sic_process::quit();
+        break;
       case('run'):
         $process_id = app::next(). '_process';
         $process    = new $process_id;

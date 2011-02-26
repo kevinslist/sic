@@ -26,23 +26,16 @@ class db {
 
   static function exec($sql, $p = null, $data_source=null,$debug=false) {
     self::connect($data_source);
-
     if (is_null($p)) {
       $count = self::$con->exec($sql);
-
     } else {
-      
       self::$s = self::$con->prepare($sql);
       $r = self::bind($p);
       $count = self::$s->execute();
       if($debug){
-        
         var_export(self::$con->errorInfo());
-        //System_Daemon::info('DB INFO: %s', var_export(self::$s,true));
       }
-      
     }
-    
     return $count;
   }
 
@@ -65,13 +58,11 @@ class db {
       }
       $t = self::$s->errorInfo();
       $error = !empty($t[2]);
-      
     } else {
       $error = true;
     }
     if($error){
-      self::log('ERROR:' . self::$s->errorInfo());
-      //throw new Exception(var_export(self::$s->errorInfo(), true));
+      self::log(self::$s);
     }
     return $r;
   }
@@ -129,15 +120,9 @@ class db {
     }
   }
   
-  public static function log($obj){
-    
-    if (is_resource(STDOUT)){ 
-      print_r($obj);
-      
-    }else{
-        $t = var_export($obj, true);
-        System_Daemon::info('DB ERROR: %s', $t);
-    }
+  public static function log($obj){ 
+    print('DB ERROR:');
+    print_r($obj);
   }
 
 }

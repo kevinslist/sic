@@ -14,8 +14,8 @@ function header_menu_clicked(){
       new_window.focus();
       break;
     case('quit-tab'):
-       applog('QUIT TAB:'+tab);
-       sic_socket_send('quit', 'quit');
+       applog('QUIT:'+tab);
+       $.get(home + 'process/quit');
       break;
     default:
        applog('MENUTABCLICKED:'+tab);

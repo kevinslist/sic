@@ -6,9 +6,20 @@ class sic_process{
   var $log_file     = '/var/www/sic_log.log';
   
   
+  static function quit_process($pid){
+    exec("kill -9 {$pid}");
+  }
+  
+  static function quit(){
+    $r = db::vals('SELECT process_pid FROM process_status WHERE process_status > 0');
+    foreach($r as $pid){
+      self::quit_process((int)$pid);
+      db::exec('UPDATE process_status SET process_pid = 0, process_status=0 WHERE process_pid=?', (int)$pid);
+    }
+  }
+  
   function run(){
     print 'default running';
-    
   }
   
   function start(){
@@ -45,16 +56,13 @@ class sic_process{
         }
       }
     }
-    
     return $running;
-    //LOCK TABLE t READ
-    //db::exec('UNLOCK TABLES');
   }
   
   public function log($log = '', $log_level=255){
-    print log($log);
+    //print $log;
     db::exec('INSERT INTO process_logs (process_id,process_log,
-                process_log_level,process_pid VALUES (?,?,?,?)',
+                process_log_level,process_pid) VALUES (?,?,?,?)',
             array($this->process_id, $log, $log_level, $this->process_pid));
   }
   

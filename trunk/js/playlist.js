@@ -36,7 +36,7 @@ function track_col_clicked(){
 }
 
 function track_double_clicked(){
-  //sic_socket_send('play',track_slow_dbl.track_id );
+  sic_socket_send('play', track_slow_dbl.track_id );
   set_track_selected();
   return false;
 }
