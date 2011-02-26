@@ -40,10 +40,13 @@ class sic_socket_process extends websocket {
       $this->log('PROCESS: %s', $action . '::' . $data);
 
       switch ($action) {
+        case('seek'):
+          $json = sic_player_process::seek_track((int)$data);
+          break;
         case('play'):
           $json = sic_player_process::play_track((int)$data);
         case('track_info'):
-          $json = db::row('select * from tracks where track_id=?', (int) $data);
+          $json = track_search::info((int)$data);
           break;
         default:
           $json = 'default';

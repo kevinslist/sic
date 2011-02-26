@@ -60,7 +60,7 @@ class app {
     define('LAYOUT_CSS', APP_LAYOUTS . APP_LAYOUT . '/css/');
     define('LAYOUT_VIEW', APP_LAYOUTS . APP_LAYOUT . '/view/');
 
-    $default_search_paths = array(APP_MODEL,APP_MODEL.'process/', APP_VIEW, APP_CONTROL, APP_LIB);
+    $default_search_paths = array(APP_LIB,APP_MODEL, APP_CONTROL, APP_MODEL.'search/', APP_MODEL.'process/', APP_VIEW);
     self::add_path($default_search_paths);
 
     if (isset($_SERVER["SERVER_NAME"])) {

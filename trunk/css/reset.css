@@ -23,6 +23,7 @@ blockquote {
 }
 .clear,.clear-both{
   clear: both;
+  height: 0px;
 }
 input[type=text]{
    -webkit-user-select: text;

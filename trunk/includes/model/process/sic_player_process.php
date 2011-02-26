@@ -20,6 +20,10 @@ class sic_player_process extends websocket {
     return $p;
   }
   
+  static function seek_track($sec){
+    self::read('seek '. $sec);
+  }
+  
   static function add_track($path){
     self::read('add ' . $path);
   }

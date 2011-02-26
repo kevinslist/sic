@@ -25,12 +25,12 @@ var main_layout_options = {
     
   },
   west: {
-    resizable: false,
+    resizable: true,
     onresize : layout_west_panel_resized
   },
   east: {
-    //initClosed: true
-    size: 900
+    initClosed: true,
+    size: 600
   },
   south: {
     size: 30,
