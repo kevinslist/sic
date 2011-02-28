@@ -56,7 +56,7 @@ class websocket extends sic_process {
       $new_action = time();
       if($new_action > $this->last_action){
         $this->last_action = $new_action;
-        $this->update_status(count($this->users));
+        $this->update_status();
       }
     }
   }

@@ -63,6 +63,14 @@ class track_saver {
     
   }
   
+  static function new_play_history($track_id = 0, $play_type=0){
+    print 'sava new play history: ';
+    print db::exec('INSERT INTO play_history (track_id, play_type, time_played) VALUES(?,?,?)', array($track_id, $play_type, time()));
+    $id = (int)db::val('SELECT LAST_INSERT_ID()');
+    print ':::' . $id;
+    return $id;
+  }
+  
   function save_to_db(){
     //System_Daemon::info('SAVE[%s] %s', $this->track_id, $this->track_path);
     //System_Daemon::info('INFO: %s', var_export($this,true));

@@ -10,8 +10,9 @@
 
 <?php
 function build_artist_level_menu($a){
-  return '<li class="artist-level" data-artist-id="">
-            <div class="artist-name drag-to-playlist" data-menu-type="artist-level">' . $a['artist_name'] . '</div>
-            <div class="album-list-wrapper">album list</div>
-          </li>';
+  return sprintf('<li class="artist-level" data-artist-id="%s">
+            <div class="artist-name drag-to-playlist" data-menu-type="artist-level">%s</div>
+            <div class="album-list-wrapper" id="%s">album list loading...</div>
+          </li>', $a['artist_id'], $a['artist_name'], 'artid'.$a['artist_id']);
+  //' . $a['artist_name'] . '
 }

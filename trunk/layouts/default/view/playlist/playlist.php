@@ -45,7 +45,7 @@
           <div class="col artist-column"><div>%s</div></div>
           <div class="col album-column"><div>%s</div></div>
           <div class="col comment-column"><div>%s</div></div>
-          <div class="col rating-column"><div>%s</div></div>
+          <div class="col rating-column" %s><div>%s</div></div>
           <div class="clear"></div>
           </div>';
         foreach($tracks as $k=>$t){
@@ -53,9 +53,10 @@
           $tid = (int)$k;
           printf($wrapper, $class, $tid, 
                   htmlentities($t['track_title']),
-                  htmlentities(implode(' | ', $t['artist_name'])),
-                  htmlentities(implode(' | ', $t['album_name'])),
-                  htmlentities(implode(' | ', $t['track_comment'])),
+                  isset($t['artist_name']) ? htmlentities(implode(' | ', $t['artist_name'])) : '',
+                  isset($t['album_name']) ? htmlentities(implode(' | ', $t['album_name'])) : '',
+                  isset($t['track_comment']) ? htmlentities(implode(' | ', $t['track_comment'])) : '',
+                  (int)$t['popm_rating'] ? 'style="background-color: #' . dechex((int)$t['popm_rating']) . '0000;"'  : '',
                   htmlentities($t['default_rating'])
                   
                   );

@@ -16,8 +16,66 @@ $(function(){
 function artist_list_loaded(text, status, xml){
   $('#collection-tab .artist-list-menu.new-load').each(function(){
     $(this).find('li div.drag-to-playlist').draggable({helper:build_collection_menu_helper});
+    $(this).find('li div.drag-to-playlist').click(load_artist_level_album_load);
     $(this).removeClass('new-load');
   });
+}
+
+function album_list_loaded(text, status, xml){
+  $('#collection-tab .album-list-menu.new-artist-load').each(function(){
+    $(this).find('li div.drag-to-playlist').draggable({helper:build_collection_menu_helper});
+    $(this).find('li div.drag-to-playlist').click(load_album_level_track_load);
+    $(this).removeClass('new-artist-load');
+  });
+}
+
+function track_list_loaded(text, status, xml){
+  $('#collection-tab .track-list-menu.new-album-load').each(function(){
+    $(this).find('li div.drag-to-playlist').draggable({helper:build_collection_menu_helper});
+    //$(this).find('li div.drag-to-playlist').click(load_album_level_track_load);
+    $(this).removeClass('new-album-load');
+  });
+}
+
+
+
+
+function do_album_level_track_load(tlwid, album_id){
+  
+    applog('load-tracks:' + album_id);
+    $('#'+tlwid).load(home + 'navigation/album_level/' + album_id,
+                                                        null,
+                                                        track_list_loaded);
+}
+function load_album_level_track_load(){
+  $(this).parent().find('.track-list-wrapper').toggle();
+  
+  if($(this).parent().find('.track-list-wrapper').children().length){
+    applog('ALBs already loaded: ' + $(this).parent().attr('data-album-id'));
+  }else{
+    var tlwid     = $(this).parent().find('.track-list-wrapper').attr('id');
+    var album_id   = $(this).parent().attr('data-album-id');
+    setTimeout('do_album_level_track_load("' + tlwid  + '", "' + album_id + '")', 10);
+  }
+}
+
+function do_artist_level_album_load(alblwid, artist_id){
+  
+    applog('load-albums:' + artist_id);
+    $('#'+alblwid).load(home + 'navigation/artist_level/' + artist_id,
+                                                        null,
+                                                        album_list_loaded);
+}
+function load_artist_level_album_load(){
+  $(this).parent().find('.album-list-wrapper').toggle();
+  
+  if($(this).parent().find('.album-list-wrapper').children().length){
+    applog('ALBs already loaded: ' + $(this).parent().attr('data-artist-id'));
+  }else{
+    var alblwid     = $(this).parent().find('.album-list-wrapper').attr('id');
+    var artist_id   = $(this).parent().attr('data-artist-id');
+    setTimeout('do_artist_level_album_load("' + alblwid  + '", "' + artist_id + '")', 10);
+  }
 }
 
 function collection_menu_top_level_clicked(){

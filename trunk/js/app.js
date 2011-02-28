@@ -15,7 +15,7 @@ $(function(){
   }
   */
   $.getJSON(home + 'process/start/sic_socket', sic_socket_inited);
-  $.getJSON(home + 'process/start/sic_player', sic_player_started);
+  //$.getJSON(home + 'process/start/sic_player', sic_player_started);
 
   $('#layout-playlist').load(home+'playlist');
   $('#application-navigation').load(home+'navigation');
@@ -31,7 +31,9 @@ function sic_socket_message(e){
     if(m){
       if(m.action != 'player_status'){
         applog('wsM_ParsedSucc: ' + t);
-      }else{
+      }
+      
+      if(m.action == 'player_status'){
         update_controls(m);
       }
     }else{
@@ -62,14 +64,13 @@ function sic_socket_close(){
 function sic_socket_send(action, text){
    if(!sic_socket){
     applog('sicsock closed can"t send');
-  }else if(action != '' && text != ''){ 
+  }else if(action != ''){ 
     try{
-    
       a = {'action':action, 'data': text};
       //var msg = JSON.stringify(a);
       var msg = $.param(a);
       sic_socket.send(msg); 
-      applog('websocket SEND: '+ msg); 
+      applog('wsSEND2: '+ msg); 
     }catch(ex){
       applog('SENDERROR:' + ex); 
     }

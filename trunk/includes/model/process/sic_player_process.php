@@ -4,6 +4,8 @@ class sic_player_process extends websocket {
 
   static $sic_player_socket = null;
   static $playing_track_id  = 0;
+  static $play_history_id   = 0;
+  static $is_paused         = 0;
   var $running_status = 1;
   
   static function play_track($track_id){
@@ -14,10 +16,27 @@ class sic_player_process extends websocket {
       self::clear_playlist();
       self::add_track($track_path);
       self::$playing_track_id = $track_id;
+      self::$play_history_id  = track_saver::new_play_history($track_id, 1);
+      self::$is_paused = 0;
       $p = 1;
       //print 'PLAY TRACK: ' . $track_path . "\n";
     }
     return $p;
+  }
+  
+  static function toggle_track(){
+    $toggle = '';
+    $info = self::get_info();
+    //print "\rINFO:" . $info . ":ENDINFOEND\r";
+    
+    if(!empty($info)){
+      $toggle = self::read('pause');
+    }
+    return $toggle;
+  }
+  
+  static function get_info(){
+    return self::read('info');
   }
   
   static function seek_track($sec){
@@ -47,26 +66,51 @@ class sic_player_process extends websocket {
 
   static function is_playing() {
     //return preg_replace('`[^0-9]`', '.', self::read('is_playing'));
-    return self::read('is_playing');
+    $info = self::get_info();
+    if(empty($info)){
+      $playing = 0;
+    }else{
+      $playing = self::read('status', true);
+    }
+    return $playing;
   }
   static function player_status() {
     return self::read('status');
   }
 
-  static function read($str) {
+  static function read($str, $status_check = false) {
     $res  = '';
     if($str){
       fwrite(self::$sic_player_socket, $str . "\n");
     }
+    $c = 0;
     do{
-      $r = fread(self::$sic_player_socket, 80);
-      $r = str_replace("\n", "", $r);
-      $r = str_replace("\r", "", $r);
-      $r = str_replace(" ", "", $r);
-      $res    .= $r;
-    }while(!self::end_with($res, '>'));
-    
-    return preg_replace('`([^0-9])`', '', $res);
+      $c++;
+      $i = fread(self::$sic_player_socket, 80);
+      if($i !== false){
+        $r = str_replace("\n", "", $i);
+        $r = str_replace("\r", "", $r);
+        $r = str_replace(" ", "", $r);
+        $res    .= $r;
+      }
+      //print '>';
+    }while(!self::end_with($res, '>') && $i !== false && $c < 20);
+    if($c == 20){
+      self::$sic_player_socket = false;
+    }
+    if($status_check){
+      //print "\rSTATUSCHECK:" . $res . "\r";
+      if( strrpos($res, 'stateplaying')){
+        $ret = 2;
+      }elseif(strrpos($res, 'statepaused')){
+        $ret = 1;
+      }else{
+        $ret = 0;
+      }
+    }else{
+      $ret = preg_replace('`([^0-9])`', '', $res);
+    }
+    return $ret;
   }
   
   static function end_with($Haystack, $Needle){
@@ -79,6 +123,7 @@ class sic_player_process extends websocket {
     if(self::$sic_player_socket){
       $t = time();
       $status = array('action' => 'player_status');
+      //print '|';
       $status['is_playing']     = (int)self::is_playing();
       if($status['is_playing']){
         $status['track_id'] = self::$playing_track_id;

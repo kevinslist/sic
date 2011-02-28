@@ -4,7 +4,7 @@ class track_search {
 
   static function info($track_id) {
     $popm_default = settings::val('popm_email_default');
-    $rs = db::query(self::$sql1 . ' WHERE t.track_id = ? ' . $count, array($popm_default, $track_id));
+    $rs = db::query(self::$sql1 . ' WHERE t.track_id = ? ', array($popm_default, $track_id));
     return current(self::merge($rs));
   }
 
@@ -25,6 +25,7 @@ class track_search {
         $new_track['track_title'] = $r['track_title'];
         $new_track['track_length'] = $r['track_length'];
         $new_track['default_rating'] = $rating;
+        $new_track['popm_rating'] = $r['default_rating'];
         $new_track['default_counter'] = $r['default_counter'];
         $new_track['track_year'] = $r['track_year'];
         $new_track['bit_rate'] = $r['bit_rate'];
@@ -35,14 +36,20 @@ class track_search {
       } else {
         $new_track = $tracks[$tid];
       }
-      $new_track['artist_id']['aid' . $r['artist_id']] = $r['artist_id'];
-      $new_track['artist_name']['an' . $r['artist_id']] = $r['artist_name'];
-      $new_track['artist_description']['ad' . $r['artist_id']] = $r['artist_description'];
-      $new_track['track_comment']['c' . $r['track_comment_id']] = $r['track_comment'];
-      $new_track['album_id']['alid' . $r['album_id']] = $r['album_id'];
-      $new_track['album_name']['aln' . $r['album_id']] = $r['album_name'];
-      $new_track['track_number']['altn' . $r['album_id']] = $r['track_number'];
-
+      if(isset($r['artist_id'])){
+        $new_track['artist_id']['aid' . $r['artist_id']] = $r['artist_id'];
+        $new_track['artist_name']['an' . $r['artist_id']] = $r['artist_name'];
+        $new_track['artist_description']['ad' . $r['artist_id']] = $r['artist_description'];
+      }
+      if(isset($r['track_comment_id'])){
+        $new_track['track_comment']['c' . $r['track_comment_id']] = $r['track_comment'];
+      }
+      
+      if(isset($r['album_id'])){
+        $new_track['album_id']['alid' . $r['album_id']] = $r['album_id'];
+        $new_track['album_name']['aln' . $r['album_id']] = $r['album_name'];
+        $new_track['track_number']['altn' . $r['album_id']] = $r['track_number'];
+      }
       if (!isset($tracks[$tid])) {
         $tracks[$tid] = $new_track;
       }

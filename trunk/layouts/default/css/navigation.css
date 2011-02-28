@@ -37,7 +37,7 @@
   color: #555;
   cursor: pointer;
   display: block;
-  padding: 1px 0px 5px 4px;
+  padding: 1px 0px 5px 2px;
 }
 #application-navigation li.top-level div.artist-letter:hover{
   background-color: #fff;
@@ -55,7 +55,7 @@ div.artist-list-wrapper div.artist-name{
   background-color: #f2f4f3;
   cursor: pointer;
   overflow: hidden;
-  padding: 1px 0px 3px 8px;
+  padding: 1px 0px 3px 4px;
   white-space: nowrap;
 }
 
@@ -63,6 +63,21 @@ div.artist-list-wrapper div.artist-name:hover{
   background-color: #ddd;
 }
 
-div.artist-list-wrapper div.album-list-wrapper{
+div.artist-list-wrapper div.album-list-wrapper,
+div.artist-list-wrapper div.album-list-wrapper div.track-list-wrapper{
   display: none;
+}
+div.artist-list-wrapper div.album-name{
+  background-color: #fff4f3;
+  cursor: pointer;
+  overflow: hidden;
+  padding: 1px 0px 3px 6px;
+  white-space: nowrap;
+}
+div.artist-list-wrapper div.track-name{
+  background-color: #ffd4ff;
+  cursor: pointer;
+  overflow: hidden;
+  padding: 1px 0px 3px 8px;
+  white-space: nowrap;
 }

@@ -2,6 +2,7 @@ $(function(){
   applog('top-nizzle: ' + home);
   $('#layout-header .main-menu li').click(header_menu_clicked);
   $('div.mini-player-controls > div.progress > div.slider').slider({step: 1, change:control_seek_track});
+  $('div.mini-player-controls > div.toggle').click(control_toggle_playing);
 
 });
 
@@ -30,6 +31,10 @@ var last_control_time = 0;
 var last_control_length = 0;
 var last_time_string = '0:00';
 
+function control_toggle_playing(){
+  sic_socket_send('toggle', 'toggle');
+}
+
 function control_seek_track(event,ui){
   if(event.originalEvent){
     var s = $('div.mini-player-controls > div.progress > div.slider').slider('option', 'value');
@@ -39,11 +44,17 @@ function control_seek_track(event,ui){
 }
 
 function update_controls(p){
-  var is_playing = p.is_playing;
-  var perc = 0;
+  //applog('update_controls1: ' + p.is_playing);
+  var is_playing = new Number(p.is_playing);
+  //applog('update_controls2: ' + p.is_playing);
   
-  if(is_playing){
-    $('div.mini-player-controls > div.toggle').text('pause');
+  if(is_playing > 0){
+    
+    if(2 == is_playing){
+      $('div.mini-player-controls > div.toggle').text('pause');
+    }else{
+      $('div.mini-player-controls > div.toggle').text('play2');
+    }
     
     if(p.length != last_control_length){
       last_control_length = new Number(p.length);

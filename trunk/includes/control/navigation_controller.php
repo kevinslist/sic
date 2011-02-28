@@ -6,6 +6,25 @@ class navigation_controller extends controller{
   }
   function control(){
     switch(app::next()){
+      
+      case('album_level'):
+        require_once APP_MODEL . 'search/artist_search.php';
+        $track_list = artist_search::track_menu_list(app::next());
+        if(!empty($track_list)){
+          include LAYOUT_VIEW . 'navigation/track_list_menu.php';
+        }else{
+          print '<div> -- empty -- </div>';
+        }
+        break;
+      case('artist_level'):
+        require_once APP_MODEL . 'search/artist_search.php';
+        $album_list = artist_search::album_menu_list(app::next());
+        if(!empty($album_list['albums']) || !empty($album_list['tracks'])){
+          include LAYOUT_VIEW . 'navigation/album_list_menu.php';
+        }else{
+          print '<div> -- empty -- </div>';
+        }
+        break;
       case('top_level'):
         require_once APP_MODEL . 'search/artist_search.php';
         $artist_list = artist_search::artist_menu_list(app::next());

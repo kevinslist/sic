@@ -1,6 +1,10 @@
 @font-face {
+  /* 
   font-family: 'ubuntu';
-  src: url(<?=APP_HOME_LAYOUT?>/css/fonts/ubuntu/Ubuntu-Regular.ttf);
+  src: url(<?=APP_HOME_LAYOUT?>/css/fonts/ubuntu/Ubuntu-Regular.ttf); 
+  */
+  font-family: 'Droid Sans', arial, serif;;
+  src: url(<?=APP_HOME_LAYOUT?>/css/fonts/Droid_Sans/DroidSans.ttf);
   font-style: normal;
 }
 
