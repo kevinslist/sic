@@ -29,7 +29,7 @@ var main_layout_options = {
     onresize : layout_west_panel_resized
   },
   east: {
-    initClosed: true,
+   // initClosed: true,
     size: 600
   },
   south: {

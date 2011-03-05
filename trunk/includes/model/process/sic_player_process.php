@@ -8,6 +8,10 @@ class sic_player_process extends websocket {
   static $is_paused         = 0;
   var $running_status = 1;
   
+  static function quit_update(){
+    print 'default sic player quit update';
+  }
+  
   static function play_track($track_id){
     $p = 0;
     if(self::$sic_player_socket && $track_id){

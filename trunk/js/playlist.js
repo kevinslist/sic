@@ -1,38 +1,55 @@
 var track_slow_dbl = new Object();
+track_slow_dbl.click_time = 0;
 
 $(function(){
   applog('play-izzle: ' + home);
   $('#layout-playlist').bind('center_resized', resize_playlist_area);
+  //$( "#playlist-body" ).selectable({filter:'div.track', distance: 1 });
+  //$( "#playlist-body div.col").dblclick(track_double_clicked);
+  $('#playlist-load-area').load(home + 'playlist/load', null, playlist_loaded);
   resize_playlist_area();
-  $( "#playlist-body" ).selectable({filter:'div.track', distance: 1 });
-  $( "#playlist-body div.col").dblclick(track_double_clicked);
-  $( "#playlist-body div.col").click(track_col_clicked);
-  
 });
 
-function check_single_click(){
-  if(track_slow_dbl.track_id){
-    applog('single-click:' + track_slow_dbl.track_id);
-    //sic_socket_send('track_info', track_slow_dbl.track_id);
-    //info for 1 window only
-    set_track_selected();
-  }
+function playlist_loaded(){
+  $('#playlist-load-area div.col').click(track_col_clicked);
+  $('#playlist-load-area div.track').draggable({helper:build_collection_menu_helper});
+  resize_playlist_area();
 }
 
 function track_col_clicked(){
-  var tid = $(this).parent().attr('data-track-id');
+  var track_row = $(this).parent();
+  var tid = $(track_row).attr('data-track-id');
   var ct  = new Date().getTime();
-  if(tid == track_slow_dbl.track_id && (ct - track_slow_dbl.click_time > 300) && (ct - track_slow_dbl.click_time < 600)){
-    applog('slow--click:' + $(this).parent().attr('data-track-id'));
-    track_slow_dbl.track_id   = false;
+  applog('TID:'+ tid + "==" + track_slow_dbl.track_id);
+  
+  if(tid == track_slow_dbl.track_id && (ct - track_slow_dbl.click_time) < 900){
+    
+    if( (ct - track_slow_dbl.click_time) < 450){
+      track_double_clicked($(this).parent().attr('data-track-id'));
+      
+    }else if( (ct - track_slow_dbl.click_time) < 900 ){
+      track_slow_clicked($(this).parent().attr('data-track-id'));
+    }
     track_slow_dbl.click_time = 0;
-    return false;
+    track_slow_dbl.track_id = false;
+    
   }else{
-    setTimeout('check_single_click();', 605);
+    
     track_slow_dbl.track_id   = tid;
     track_slow_dbl.click_time = ct;
-    return true;
+    track_single_clicked();
   }
+  
+  return false;
+}
+
+function track_single_clicked(){
+    applog('single-click:' + track_slow_dbl.track_id);
+    set_track_selected();
+}
+function track_slow_clicked(){
+  applog('slow--click:' + track_slow_dbl.track_id);
+  return false;
 }
 
 function track_double_clicked(){
@@ -43,14 +60,10 @@ function track_double_clicked(){
 
 function set_track_selected(){
   var track_id = track_slow_dbl.track_id;
-  var row = $('#playlist-body > div.track[data-track-id=' + track_id + ']');
+  var row = $('#playlist-load-area div.track[data-track-id=' + track_id + ']');
   var selected = $(row).hasClass('ui-selected');
-  $('#playlist-body > div.track').removeClass('ui-selected');
+  $('#playlist-load-area div.track').removeClass('ui-selected');
   $(row).toggleClass('ui-selected', !selected);
-  //applog('single-click:' + track_slow_dbl.track_id);
-  track_slow_dbl.track_id   = false;
-  track_slow_dbl.click_time = 0;
-  //$.get(home + 'player/goto/' + track_id);
 }
 
 function resize_playlist_area(){
@@ -63,14 +76,19 @@ function resize_playlist_area(){
   
   var rating_column = 50;
   var currently_playing_column = 18;
-  pw = (pw - rating_column) - currently_playing_column;
+  var length_column = 40;
   
-  var title_column = .30 * pw;
+  pw = (pw - rating_column) - currently_playing_column - length_column;
+  
+  var title_column = .25 * pw;
   var artist_column = .15 * pw;
-  var album_column = .25 * pw;
+  var album_column = .20 * pw;
+  var genre_column = .15 * pw;
   
-  var comment_column = pw - (title_column + artist_column + album_column);
-  rating_column = rating_column - 6;
+  var comment_column = pw - (title_column + artist_column + album_column + genre_column);
+  
+  rating_column = rating_column;
+  length_column = length_column - 7;
 
   $('#playlist-wrapper .currently-playing-column').width(currently_playing_column);
   $('#playlist-wrapper .title-column').width(title_column);
@@ -78,5 +96,7 @@ function resize_playlist_area(){
   $('#playlist-wrapper .album-column').width(album_column);
   $('#playlist-wrapper .comment-column').width(comment_column);
   $('#playlist-wrapper .rating-column').width(rating_column);
+  $('#playlist-wrapper .genre-column').width(genre_column);
+  $('#playlist-wrapper .length-column').width(length_column);
   
 }

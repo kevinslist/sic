@@ -50,6 +50,10 @@ class track_search {
         $new_track['album_name']['aln' . $r['album_id']] = $r['album_name'];
         $new_track['track_number']['altn' . $r['album_id']] = $r['track_number'];
       }
+      if(isset($r['genre_name'])){
+        $new_track['genre_name'][$r['genre_name']] = $r['genre_name'];
+      }
+      
       if (!isset($tracks[$tid])) {
         $tracks[$tid] = $new_track;
       }
@@ -63,8 +67,8 @@ class track_search {
     ini_set('memory_limit', '300m');
     $popm_default = settings::val('popm_email_default');
     $limit = (int) $count > 0 ? (int)$count : 40000;
-
-    $rs = db::query(self::$sql1 . ' ORDER BY RAND() LIMIT ' . $count, $popm_default);
+    $random_sql = self::$sql1 . '  WHERE tp.popm_rating > 40 ';
+    $rs = db::query($random_sql . ' ORDER BY RAND() LIMIT ' . $count, $popm_default);
     //WHERE a.artist_name_index LIKE "%layer%"
     //ORDER BY 
     //t.track_id, ta.track_artist_order, 
@@ -84,7 +88,8 @@ class track_search {
                       LEFT JOIN track_album tal ON t.track_id = tal.track_id
                       LEFT JOIN albums al ON tal.album_id = al.album_id
                       LEFT JOIN track_comments tc ON t.track_id = tc.track_id
-                      LEFT JOIN track_popm tp ON t.track_id = tp.track_id AND tp.popm_email = ?';
+                      LEFT JOIN track_popm tp ON t.track_id = tp.track_id AND tp.popm_email = ?
+                      ';
   
   
     //WHERE a.artist_name_index LIKE "%layer%"

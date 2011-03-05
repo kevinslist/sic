@@ -12,14 +12,13 @@ $(function(){
   end   = 0;
   for(i=0;i<thread_count;i++){
     setTimeout("$.getJSON(home+'tracks/all/" + i + "', tracks_loaded);", 20 + ((i) * 300));
-  }
+  } 
   */
-  $.getJSON(home + 'process/start/sic_socket', sic_socket_inited);
-  //$.getJSON(home + 'process/start/sic_player', sic_player_started);
 
-  $('#layout-playlist').load(home+'playlist');
-  $('#application-navigation').load(home+'navigation');
   $('#layout-header').load(home+'header');
+  $('#application-navigation').load(home+'navigation');
+  $('#layout-playlist').load(home+'playlist');
+  $.getJSON(home + 'process/start/sic_socket', sic_socket_inited);
  
 });
 
@@ -29,7 +28,7 @@ function sic_socket_message(e){
     t = e.data;
     m = $.parseJSON(t);
     if(m){
-      if(m.action != 'player_status'){
+      if(m.action != '22player_status'){
         applog('wsM_ParsedSucc: ' + t);
       }
       
@@ -47,12 +46,13 @@ function sic_socket_message(e){
 
 function sic_socket_open(){
   applog('wsOPEN!');
-  //sic_socket_send('hello', 'world');
+  sic_socket_send('status', 'update');
 }
 
 function sic_socket_closed(){
   applog('wsCLOSED!');
   sic_socket = null;
+  control_app_quit();
 }
 
 function sic_socket_close(){
