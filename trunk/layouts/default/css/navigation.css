@@ -16,12 +16,12 @@
   background-color: #fff;
 }
 
-#collection-tab .search-bar{
+#collection-navigation-area .search-bar{
   background-color: #eee;
   border-bottom: 1px solid #ccc;
   padding: 2px 0px;
 }
-#collection-tab .search-bar #collection-search{
+#collection-navigation-area .search-bar #collection-search{
   border: none;
   color: #666;
   display: block;

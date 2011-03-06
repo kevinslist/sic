@@ -1,14 +1,9 @@
-<div id="collection-default-menu" class="collection-menu-area">
+<div data-search-key="<?=$query?>" class="collection-menu-area">
   <ul id="artist-sort-menu">
     <?php 
-    for($i=65;$i<91;$i++){
-      print build_top_level_menu(chr($i));
+    foreach($data as $k=>$v){
+      print build_top_level_menu($k);
     }
-    for($i=0;$i<10;$i++){
-      print build_top_level_menu($i);
-    }
-    print build_top_level_menu('Other');
-    print build_top_level_menu('Unknown');
     ?>
   </ul>
 </div>

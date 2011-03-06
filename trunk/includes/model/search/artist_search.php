@@ -9,7 +9,9 @@ class artist_search {
       $artists = db::query('SELECT * FROM artists WHERE artist_name LIKE ? or artist_name LIKE ? ORDER BY artist_name ASC', array($letter . '%', strtolower($letter) . '%'));
     } elseif (preg_match('`^[0-9]{1}$`', $letter)) {
       $artists = db::query('SELECT * FROM artists WHERE artist_name LIKE ? ORDER BY artist_name ASC', array($letter . '%'));
-    } else {
+    } elseif (preg_match('`unknown`i', $letter)) {
+      $artists = self::album_menu_list(0);
+    }else {
       $artists = db::query("SELECT * FROM artists WHERE artist_name REGEXP '^[^a-zA-Z0-9]' ORDER BY artist_name ASC");
     }
 

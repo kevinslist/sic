@@ -9,12 +9,59 @@ $(function(){
   $('div.drag-to-playlist').draggable({helper:build_collection_menu_helper});
   $('#layout-playlist').droppable({accept:'.drag-to-playlist', drop:add_to_playlist});
   $('.collection-menu-area li div.artist-letter').click(collection_menu_top_level_clicked);
-  
+
+  $('#collection-search').data('timeout', null).keyup(function(){
+      clearTimeout($(this).data('timeout'));
+      $(this).data('timeout', setTimeout(submit_collection_search, 800));
+  });
   
 });
+var collection_searches = new Object();
+collection_searches.empty = null;
+collection_searches.searches = new Array();
+
+function submit_collection_search(){
+  var s = $('#collection-search').val();
+  var temp = $('#collection-navigation-area div.collection-menu-area').detach();
+  var id = $(temp).attr('data-search-key');
+    
+  if(id){
+    applog('Cache-ID:' + id);
+    collection_searches.searches[id] = temp;
+  }else{
+    collection_searches.empty = temp;
+    applog('NO_CACHE-ID:' + id);
+  }
+    
+  if('' == s){
+    applog("empty search");
+    if(collection_searches.empty){
+      applog("def IS SET");
+      $(collection_searches.empty).appendTo('#collection-search-load-area');
+    }else{
+      applog("def NOT SET");
+      $(temp).appendTo('#collection-search-load-area');
+    }
+    resize_collection_menu_area();
+  }else{
+    
+    if(collection_searches.searches[s]){
+      applog('load cached search: ' + s);
+      $(collection_searches.searches[s]).appendTo('#collection-search-load-area');
+      resize_collection_menu_area();
+    }else{
+      applog('submit COL Search: ' + s);
+      $('#collection-search-load-area').load(home + 'navigation/search', {'q':s}, collection_search_loaded);
+    }
+  }
+}
+
+function collection_search_loaded(){
+  applog('searh results loaded');
+}
 
 function artist_list_loaded(text, status, xml){
-  $('#collection-tab .artist-list-menu.new-load').each(function(){
+  $('#collection-navigation-area .artist-list-menu.new-load').each(function(){
     $(this).find('li div.drag-to-playlist').draggable({helper:build_collection_menu_helper});
     $(this).find('li div.drag-to-playlist').click(load_artist_level_album_load);
     $(this).removeClass('new-load');
@@ -22,7 +69,7 @@ function artist_list_loaded(text, status, xml){
 }
 
 function album_list_loaded(text, status, xml){
-  $('#collection-tab .album-list-menu.new-artist-load').each(function(){
+  $('#collection-navigation-area .album-list-menu.new-artist-load').each(function(){
     $(this).find('li div.drag-to-playlist').draggable({helper:build_collection_menu_helper});
     $(this).find('li div.drag-to-playlist').click(load_album_level_track_load);
     $(this).removeClass('new-artist-load');
@@ -30,7 +77,7 @@ function album_list_loaded(text, status, xml){
 }
 
 function track_list_loaded(text, status, xml){
-  $('#collection-tab .track-list-menu.new-album-load').each(function(){
+  $('#collection-navigation-area .track-list-menu.new-album-load').each(function(){
     $(this).find('li div.drag-to-playlist').draggable({helper:build_collection_menu_helper});
     //$(this).find('li div.drag-to-playlist').click(load_album_level_track_load);
     $(this).removeClass('new-album-load');
