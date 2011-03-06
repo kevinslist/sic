@@ -110,7 +110,6 @@ class collection_scanner {
   function parse_modified_files(){
     $tracks = db::query('SELECT track_id,track_path FROM tracks WHERE last_mod > prev_scan');
     if(count($tracks) > 0){
-      require_once APP_MODEL . 'track_saver.php';
       $i = 0;
       foreach($tracks as $t){
         track_saver::update_from_file($t['track_id'], $t['track_path']);

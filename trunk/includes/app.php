@@ -39,6 +39,7 @@ class app {
   }
 
   public static function init() {
+    ini_set('memory_limit', '500m');
     spl_autoload_register('app::autoload');
     self::$dsns['default'] = array('host' => 'mysql:host=localhost;dbname=sic', 'username' => 'music', 'password' => 'music');
 
@@ -60,7 +61,7 @@ class app {
     define('LAYOUT_CSS', APP_LAYOUTS . APP_LAYOUT . '/css/');
     define('LAYOUT_VIEW', APP_LAYOUTS . APP_LAYOUT . '/view/');
 
-    $default_search_paths = array(APP_LIB,APP_MODEL, APP_CONTROL, APP_MODEL.'search/', APP_MODEL.'process/', APP_VIEW);
+    $default_search_paths = array(APP_LIB,APP_MODEL, APP_CONTROL, APP_MODEL.'search/', APP_MODEL.'process/', APP_VIEW, APP_MODEL.'track_saver/');
     self::add_path($default_search_paths);
 
     if (isset($_SERVER["SERVER_NAME"])) {

@@ -54,15 +54,19 @@ function track_slow_clicked(){
 
 function track_double_clicked(){
   sic_socket_send('play', track_slow_dbl.track_id );
-  set_track_selected();
+  set_track_selected(1);
   return false;
 }
 
-function set_track_selected(){
+function set_track_selected(do_selected){
   var track_id = track_slow_dbl.track_id;
   var row = $('#playlist-load-area div.track[data-track-id=' + track_id + ']');
-  var selected = $(row).hasClass('ui-selected');
+  
   $('#playlist-load-area div.track').removeClass('ui-selected');
+  var selected = $(row).hasClass('ui-selected');
+  if(do_selected){
+    selected = false;
+  }
   $(row).toggleClass('ui-selected', !selected);
 }
 
@@ -76,7 +80,7 @@ function resize_playlist_area(){
   
   var rating_column = 50;
   var currently_playing_column = 18;
-  var length_column = 40;
+  var length_column = 45;
   
   pw = (pw - rating_column) - currently_playing_column - length_column;
   

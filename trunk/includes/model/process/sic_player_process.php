@@ -4,7 +4,7 @@ class sic_player_process extends websocket {
 
   static $sic_player_socket = null;
   static $playing_track_id  = 0;
-  static $play_history_id   = 0;
+  static $track_history_id   = 0;
   static $is_paused         = 0;
   var $running_status = 1;
   
@@ -20,7 +20,7 @@ class sic_player_process extends websocket {
       self::clear_playlist();
       self::add_track($track_path);
       self::$playing_track_id = $track_id;
-      self::$play_history_id  = track_saver::new_play_history($track_id, 1);
+      self::$track_history_id  = track_saver::new_track_history($track_id, 1);
       self::$is_paused = 0;
       $p = 1;
       //print 'PLAY TRACK: ' . $track_path . "\n";
