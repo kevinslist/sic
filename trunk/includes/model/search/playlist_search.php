@@ -1,6 +1,63 @@
 <?php
 
 class playlist_search {
+  
+  static function get_next_track_id($playlist_id = 0, $playing_track_id = 0, $playlist_played, $sic_username){
+    $player_shuffle = settings::val('player_shuffle');
+    $player_repeat  = settings::val('player_repeat');
+    $track_id       = 0;
+    
+    if(!empty($played_by_username)){
+      if(empty($playlist_id)){
+        $playlist_history = db::row('SELECT * FROM playlist_history WHERE sic_username=? ORDER BY playlist_accessed DESC', $sic_username);
+      }else{
+        $playlist_history = db::row('SELECT * FROM playlist_history WHERE sic_username=? AND playlist_id = ? ORDER BY playlist_accessed DESC', 
+                array($sic_username,$playlist_id));
+      }
+    }else{
+      if(empty($playlist_id)){
+        $playlist_history = db::row('SELECT * FROM playlist_history ORDER BY playlist_accessed DESC');
+      }else{
+        $playlist_history = db::row('SELECT * FROM playlist_history WHERE playlist_id = ? ORDER BY playlist_accessed DESC', $playlist_id);
+      }
+    }
+    
+    if(!empty($playlist_history)){
+      
+      $all_tracks = db::vals('SELECT track_id FROM playlist_tracks WHERE playlist_id=? 
+                              ORDER BY playlist_track_order ASC', 
+                              (int)$playlist_history['playlist_id']);
+      $next_id = 0;
+      $found_current = false;
+      
+      if(isset($playlist_history['playlist_id'])){
+        $possible_tracks = array();
+        foreach($all_tracks as $tid){
+          if(!isset($playlist_history['playlist_id'][$tid])){
+            $possible_tracks[] = $tid;
+            if($found_current && empty($next_id)){
+              $next_id = $tid;
+            }
+            if($playing_track_id == $tid){
+              $found_current = true;
+            }
+          }
+        }
+      }else{
+        $possible_tracks = $all_tracks;
+      }
+      
+      $track_id = $next_id;
+      // check random, order, etc...
+      
+    }
+    
+    if(empty($track_id)){
+      print "GRAB RANDOM TRACK ID FROM tracks\r";
+    }
+    
+    return $track_id;
+  }
 
   static function load_playlist($playlist_id = 0) {
     
@@ -22,8 +79,11 @@ class playlist_search {
       $playlist_id = self::create_new_user_playlist();
       self::add_random_tracks($playlist_id);
     }
+    return $playlist_id;
+  }
+  
+  static function get_playlist_tracks($playlist_id){
     self::update_playlist_history($playlist_id);
-
     return track_search::load_playlist($playlist_id);
   }
   

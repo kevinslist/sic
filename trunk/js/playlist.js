@@ -53,9 +53,13 @@ function track_slow_clicked(){
 }
 
 function track_double_clicked(){
-  sic_socket_send('play', track_slow_dbl.track_id );
+  sic_socket_send('play', track_slow_dbl.track_id, {"playlist_id": playlist_get_id()} );
   set_track_selected(1);
   return false;
+}
+
+function playlist_get_id(){
+  return $('#playlist-load-area div.current-playlist-id').attr('data-playlist-id');
 }
 
 function set_track_selected(do_selected){

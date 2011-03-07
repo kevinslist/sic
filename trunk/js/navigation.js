@@ -4,18 +4,16 @@ $(function(){
   //$('#layout-header .main-menu li').click(header_menu_clicked);
   
   $('#application-navigation').bind('west_resized', resize_collection_menu_area);
-  resize_collection_menu_area();
   
-  $('div.drag-to-playlist').draggable({helper:build_collection_menu_helper});
   $('#layout-playlist').droppable({accept:'.drag-to-playlist', drop:add_to_playlist});
-  $('.collection-menu-area li div.artist-letter').click(collection_menu_top_level_clicked);
-
+  top_level_loaded();
   $('#collection-search').data('timeout', null).keyup(function(){
       clearTimeout($(this).data('timeout'));
       $(this).data('timeout', setTimeout(submit_collection_search, 800));
   });
   
 });
+
 var collection_searches = new Object();
 collection_searches.empty = null;
 collection_searches.searches = new Array();
@@ -58,6 +56,17 @@ function submit_collection_search(){
 
 function collection_search_loaded(){
   applog('searh results loaded');
+  $('#collection-search-load-area div.artist-list-wrapper').show();
+  artist_list_loaded();
+  album_list_loaded();
+  track_list_loaded();
+  top_level_loaded();
+}
+
+function top_level_loaded(){
+  $('div.artist-letter.drag-to-playlist').draggable({helper:build_collection_menu_helper});
+  $('.collection-menu-area li div.artist-letter').click(collection_menu_top_level_clicked);
+  resize_collection_menu_area();
 }
 
 function artist_list_loaded(text, status, xml){

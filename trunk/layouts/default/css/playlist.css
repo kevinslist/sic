@@ -81,3 +81,7 @@
   background-color: #ffd;
   border-bottom: 1px solid #eec;
 }
+
+#playlist-load-area div.current-playlist-id{
+  display: none;
+}

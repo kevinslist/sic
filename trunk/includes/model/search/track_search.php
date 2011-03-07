@@ -67,7 +67,7 @@ class track_search {
 
   static function load_playlist($playlist_id) {
     $popm_default = settings::val('popm_email_default');
-    return self::merge(db::query(self::$sql_playlist, array($popm_default, (int) $playlist_id)));
+    return self::merge(db::query(self::$sql_playlist, array($popm_default, (int)$playlist_id)));
   }
 
   static function random($count = 100) {

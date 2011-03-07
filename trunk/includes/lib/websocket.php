@@ -29,7 +29,7 @@ class websocket extends sic_process {
     while (true && !$this->do_quit) {
       $changed = $this->sockets;
       $user_action = false;
-      socket_select($changed, $write = NULL, $except = NULL, 1);  // sec, millsec
+      socket_select($changed, $write = NULL, $except = NULL, 0, 420000);  // sec, millsec
       foreach ($changed as $socket) {
         if ($socket == $this->master) {
           $client = socket_accept($this->master);
@@ -54,12 +54,7 @@ class websocket extends sic_process {
           }
         }
       }
-      
-      $new_action = time();
-      if(true || $new_action > $this->last_action){
-        $this->last_action = $new_action;
-        $this->update_status($user_action);
-      }
+      $this->update_status($user_action);
     }
   }
 
@@ -79,7 +74,7 @@ class websocket extends sic_process {
   function broadcast($data) {
     if (!empty($data)) {
       foreach ($this->users as $user) {
-        if ($user->handshake && $user->socket) {
+        if($user->requested_status && $user->handshake && $user->socket) {
           $this->send($user->socket, $data);
         }
       }
@@ -215,6 +210,6 @@ class WebSocketUser {
   var $id;
   var $socket;
   var $handshake;
-
+  var $requested_status = false;
 }
 

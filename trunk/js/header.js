@@ -6,8 +6,19 @@ $(function(){
     change:control_seek_track
   });
   $('div.mini-player-controls > div.toggle').click(control_toggle_playing);
+  $('div.mini-player-controls > div.next').click(control_next_track);
+  $('div.mini-player-controls > div.previous').click(control_prev_track);
 
 });
+
+function control_prev_track(){
+  applog('PREV TRACK CLICKED:');
+  sic_socket_send('prev_track', $('#playlist-load-area div.current-playlist-id').attr('data-playlist-id'));
+}
+function control_next_track(){
+  applog('NEXT TRACK CLICKED:');
+  sic_socket_send('next_track', $('#playlist-load-area div.current-playlist-id').attr('data-playlist-id'));
+}
 
 function header_menu_clicked(){
   

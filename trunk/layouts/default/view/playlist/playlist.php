@@ -1,3 +1,4 @@
+<div class="current-playlist-id" data-playlist-id="<?=$playlist_id?>"></div>
 <?php 
 $assoc_rec  = 0;
 $wrapper = '<div class="track %s" data-track-id="%s">

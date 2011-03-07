@@ -7,7 +7,8 @@ class playlist_controller extends controller{
   function control(){
     switch(app::next()){
       case('load'):
-        $tracks = playlist_search::load_playlist(app::next());
+        $playlist_id = playlist_search::load_playlist(app::next());
+        $tracks = playlist_search::get_playlist_tracks($playlist_id);
         include LAYOUT_VIEW . 'playlist/playlist.php';
         break;
       default:

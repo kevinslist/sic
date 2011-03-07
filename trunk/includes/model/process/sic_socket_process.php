@@ -6,29 +6,28 @@ class sic_socket_process extends websocket {
   var $sic_player_socket      = null;
   var $send_update_count      = 0;
   var $send_update_count_fix  = 0;
-
-  
   
   static function quit_update(){
     print 'default sic socket quit update';
   }
   
   function update_status($user_action = false) {
+    sic_player_process::update_player_status();
+    if ($this->player_socket_connected()) {
+      if ($user_action || $this->send_update_count > 0 || $this->send_update_count_fix > 9 && count($this->users)) {
+        $this->send_update_count_fix = 0;
+        $this->send_update_count--;
 
-    if ($user_action || $this->send_update_count > 0 || $this->send_update_count_fix > 9) {
-      $this->send_update_count_fix = 0;
-      $this->send_update_count--;
-      if ($this->player_socket_connected() && count($this->users)) {
-        //print '.';
         if ($this->sic_player_socket) {
           $status = sic_player_process::get_player_status();
         } else {
           $status = array('action' => 'player_status', 'is_running' => 'false', 'connected' => 'false');
         }
         $this->broadcast($status);
+        
+      }else{
+        $this->send_update_count_fix++;
       }
-    }else{
-      $this->send_update_count_fix++;
     }
   }
 
@@ -78,13 +77,28 @@ class sic_socket_process extends websocket {
           $json = sic_player_process::seek_track((int) $data);
           $this->send_update_count = 2;
           break;
+        case('prev_track'):
+          $json = sic_player_process::user_prev_track((int) $data, $sic_username);
+          if(!empty($json)){
+            $this->send_update_count = 6;
+            $json = track_search::info($json);
+          }
+          break;
+        case('next_track'):
+          $json = sic_player_process::user_next_track((int) $data, $sic_username);
+          if(!empty($json)){
+            $this->send_update_count = 6;
+            $json = track_search::info($json);
+          }
+          break;
         case('play'):
-          $json = sic_player_process::play_track((int) $data);
+          $json = sic_player_process::user_played_track((int) $data, $sic_username, $playlist_id);
           $this->send_update_count = 6;
         case('track_info'):
           $json = track_search::info((int) $data);
           break;
         case('status'):
+          $user->requested_status = true;
           $this->send_update_count = 1;
         default:
           $json = 'default';
@@ -108,6 +122,7 @@ class sic_socket_process extends websocket {
     $sic_player_process->run();
     if ($this->server_can_start()) {
       // start_server in child websocket class
+      sic_player_process::$web_socket = $this;
       $this->start_server();
     }
   }

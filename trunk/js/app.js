@@ -50,25 +50,28 @@ function sic_socket_open(){
 }
 
 function sic_socket_closed(){
-  applog('wsCLOSED!');
+  applog('ws__onclose__CLOSED!');
   sic_socket = null;
   control_app_quit();
 }
 
 function sic_socket_close(){
-  applog('wsCLOSEING!');
+  applog('ws__unload__closING!');
   if(sic_socket){
     sic_socket.close();
   }
 }
-function sic_socket_send(action, text){
+function sic_socket_send(action, text, data){
    if(!sic_socket){
     applog('sicsock closed can"t send');
   }else if(action != ''){ 
     try{
-      a = {'action':action, 'data': text};
+      a = {'action':action, 'data': text, 'sic_username': $.cookie('sic_username')};
       //var msg = JSON.stringify(a);
       var msg = $.param(a);
+      if(data){
+        msg = msg + '&' + $.param(data);
+      }
       sic_socket.send(msg); 
       applog('wsSEND2: '+ msg); 
     }catch(ex){
@@ -84,7 +87,11 @@ function sic_player_started(data){
 }
 
 function sic_socket_inited(data){
-  applog( var_export(data,true));
+  applog('INITED:' + var_export(data,true));
+  setTimeout("sic_socket_do_connect();", 200);
+}
+function sic_socket_do_connect(){
+  applog('ATTEMPT CONNECT:' + "ws://127.0.0.1:12345/");
   sic_socket = new WebSocket("ws://127.0.0.1:12345/");
   sic_socket.onopen = sic_socket_open;
   sic_socket.onmessage = sic_socket_message;
