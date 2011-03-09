@@ -41,7 +41,7 @@ class app {
   public static function init() {
     ini_set('memory_limit', '500m');
     spl_autoload_register('app::autoload');
-    self::$dsns['default'] = array('host' => 'mysql:host=localhost;dbname=sic', 'username' => 'music', 'password' => 'music');
+    self::$dsns['default'] = array('host' => 'mysql:host=localhost;dbname=sic', 'username' => 'sic', 'password' => 'sic');
 
     define('APP_INCLUDES', dirname(__file__) . '/');
     define('APP_DIR', dirname(APP_INCLUDES . '../../') . '/');
@@ -71,7 +71,7 @@ class app {
 
     } else {
       define('APP_CRON', true);
-      define('APP_HOME', 'http://music/');
+      define('APP_HOME', 'http://sic/');
     }
     
     define('APP_HOME_CSS', APP_HOME . 'css/');
