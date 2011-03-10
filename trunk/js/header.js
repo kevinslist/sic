@@ -24,18 +24,15 @@ function header_menu_clicked(){
   
   var tab = $(this).attr('id');
   switch(tab){
-    case('collection-scan-tab'):
-      new_window = window.open(home + 'collection_scanner/menu','collection-scanner-menu','scrollbars=no,resizable=no,toolbar=no,location=no,width=400,height=200');
-      new_window.moveTo( (screen.width / 2 - 200), (screen.height / 2 - 100));
-      new_window.focus();
-      break;
     case('quit-tab'):
       applog('QUIT:'+tab);
       control_app_quit();
       $.get(home + 'process/quit');
       break;
+    case('collection-scan-tab'):
     default:
-      applog('MENUTABCLICKED:'+tab);
+      new_window = window.open(home + 'menu#'+tab,'main-menu');
+      new_window.focus();
       break;
   }
   

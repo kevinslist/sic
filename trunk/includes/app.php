@@ -90,17 +90,18 @@ class app {
     $dir    = isset($_SERVER['DOCUMENT_ROOT']) ? $_SERVER['DOCUMENT_ROOT'] : APP_WEBROOT;
     $query  = isset($_SERVER['REQUEST_URI'])   ? $_SERVER['REQUEST_URI'] : $argv[1];
     //$query  = isset($argv) && !empty($argv) ? $argv[1] : $_SERVER['REQUEST_URI'];
-    
+
     if(isset($argv)){
       $depth = 0;
     }else{
+
       $regex = '`' . $dir . '/*`';
       $subdir = preg_replace($regex, '', APP_WEBROOT);
       $subdir = preg_replace('`/$`', '', $subdir);
       $depth = empty($subdir) ? 0 : count(explode("/", $subdir));
       $pre = '/' . (empty($subdir) ? '' : $subdir . '/');
     }
-    
+
     if (preg_match('`([^?#]*)`', trim($query), $matches)) {
       $t = trim($matches[1]);
 

@@ -3,7 +3,7 @@ define('SIC_PLAYER_STOPPED', 0);
 define('SIC_PLAYER_PAUSED', 1);
 define('SIC_PLAYER_PLAYING', 2);
 
-class sic_player_process extends websocket {
+class sic_player_process extends sic_process {
   static $web_socket        = null;
   static $sic_player_socket = null;
   static $played_by_username = '';
@@ -18,7 +18,11 @@ class sic_player_process extends websocket {
   static $playlist_played   = array();
   static $prev_history      = array();
   static $next_history      = array();
-  
+
+  function __construct(){
+    parent::__construct();
+    $this->process_id = 'sic_player';
+  }
 
   static function quit_update() {
     print 'default sic player quit update';
@@ -235,10 +239,8 @@ class sic_player_process extends websocket {
         if(SIC_PLAYER_PLAYING == self::$playing_status){
           self::check_song_finished();
         }
-        
       }
     }
-    
   }
 
   static function get_player_status() {
@@ -271,10 +273,10 @@ class sic_player_process extends websocket {
     db::exec('LOCK TABLE process_status WRITE');
     if (!$this->running()) {
       //$command = 'nohup php ' . APP_DIR . 'index.php /process/run/' . $this->process_id . ' > ' . $this->log_file . ' 2>&1 & echo $!';
-      $command = 'cvlc --extraintf=rc --rc-host=' .
+      $command = 'vlc --extraintf=rc --rc-host=' .
               $this->host . ':' .
               $this->port .
-              ' -I dummy >/var/www/vlc_out 2>&1 & echo $!';
+              ' -I dummy >> ' . APP_DIR . 'out/vlc.out 2>&1 & echo $!';
 
       // --rc-fake-tty
       //printf urlencode($command);
@@ -289,10 +291,6 @@ class sic_player_process extends websocket {
     $did_start = true;
     db::exec('UNLOCK TABLES');
     return $did_start;
-  }
-
-  function __construct() {
-    $this->process_id = 'sic_player';
   }
 
 }

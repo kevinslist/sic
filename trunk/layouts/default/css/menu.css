@@ -1,0 +1,39 @@
+
+
+div.menu-wrapper{
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+div.ui-tabs-nav-wrapper{
+  background-color: #afc4df;
+  height: 100%;
+  position: absolute;
+    top: 0px;
+    left: 0px;
+  margin: 0px;
+  padding: 0px;
+  width: 200px;
+  z-index: 5;
+}
+.ui-tabs-panel {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    padding-left: 210px;
+    z-index: 2;
+}
+.ui-tabs .ui-tabs-nav li,
+.ui-tabs .ui-tabs-nav li a{
+  display: block;
+  float: none;
+  font-size: 110%;
+  line-height: 180%;
+}
+.ui-tabs .ui-tabs-nav li a{
+  padding-left: 10px;
+}
+.ui-tabs .ui-tabs-nav li a:hover{
+  background-color: #fff;
+}

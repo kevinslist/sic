@@ -13,7 +13,7 @@ class websocket extends sic_process {
   var $host = 'your-mama';
   var $last_action = 0;
   function __construct() {
-    
+    parent::__construct();
   }
 
   function start_server() {

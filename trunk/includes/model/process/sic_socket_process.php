@@ -6,7 +6,7 @@ class sic_socket_process extends websocket {
   var $sic_player_socket      = null;
   var $send_update_count      = 0;
   var $send_update_count_fix  = 0;
-  
+
   static function quit_update(){
     print 'default sic socket quit update';
   }
@@ -145,8 +145,11 @@ class sic_socket_process extends websocket {
   }
 
   function __construct() {
+    parent::__construct();
     $this->process_id = 'sic_socket';
   }
+  
+
 
   function broadcast($data) {
     if (!empty($data)) {

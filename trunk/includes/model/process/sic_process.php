@@ -3,8 +3,12 @@
 class sic_process{
   var $process_id   = 'process';
   var $process_pid  = 0;
-  var $log_file     = '/var/www/sic_log.log';
-  
+  var $log_file     = '';
+
+  function __construct(){
+    $this->log_file = APP_DIR . 'out/sic_log.log';
+  }
+
   static function quit_update(){
     print 'default quit update';
   }
@@ -28,6 +32,7 @@ class sic_process{
   function start(){
     if(!$this->running()){
       $command = 'nohup php ' . APP_DIR . 'index.php /process/run/' . $this->process_id . ' >> ' . $this->log_file . ' 2>&1 & echo $!';
+
       exec($command);
     }
     return array_merge( array('running'=>$this->running()), $this->status());
