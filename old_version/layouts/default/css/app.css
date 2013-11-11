@@ -1,0 +1,29 @@
+@font-face {
+  /* 
+  font-family: 'ubuntu';
+  src: url(<?=APP_HOME_LAYOUT?>/css/fonts/ubuntu/Ubuntu-Regular.ttf); 
+  */
+  font-family: 'Droid Sans', arial, serif;;
+  src: url(<?=APP_HOME_LAYOUT?>/css/fonts/Droid_Sans/DroidSans.ttf);
+  font-style: normal;
+}
+
+html,body{
+  font-family: "ubuntu";
+  width: 100%;
+  height: 100%;
+}
+body {
+  background: #EDEDED url(<?=APP_HOME_LAYOUT?>images/body-grey-bg.gif) repeat-x scroll left top;
+	color: #333;
+	font-size:80%;
+	line-height: 1em;
+}
+
+
+a, a:visited{
+  color: #333;
+}
+a:hover{
+  color: #600;
+}

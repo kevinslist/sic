@@ -1,0 +1,43 @@
+#layout-header{
+	background: #f5f6f5 url(<?=APP_HOME_LAYOUT?>images/main-menu-bg.png) repeat-x;
+}
+div.header-wrapper{
+  width: 100%;
+}
+.main-menu{
+	color: #ddd;
+  padding: 0px;
+  float: left;
+}
+.main-menu li{
+	/* background: #333 url(<?=APP_HOME_LAYOUT?>images/main-menu-bg.png) repeat-x; */
+	cursor: pointer;
+	float: left;
+	padding: 0px 10px;
+  line-height: 30px;
+}
+.main-menu li:hover{
+	background-color: #eee;
+}
+.main-menu li:active{
+	background-color: #fef;
+	color: #838;
+  text-shadow: 0px -1px 0px #535;
+}
+
+div.mini-player-controls{
+  float: right;
+}
+div.mini-player-controls div.control{
+  float: left;
+  border: 1px solid #aaa;
+  height: 20px;
+  margin-top: 3px;
+}
+div.mini-player-controls div.control.progress{
+  width: 150px;
+  padding: 0px 15px;
+}
+div.mini-player-controls div.control.progress div.slider{
+  margin-top: 4px;
+}
