@@ -1,0 +1,35 @@
+DirectoryIndex kb_index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule .*\.svn/.* - [F]
+
+    RewriteCond %{SERVER_PORT} 80
+    #RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R,L]
+
+    RewriteCond %{REQUEST_URI} ^application.*
+    RewriteRule ^(.*)$ kb_index.php/$1 [L]
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ kb_index.php/$1 [L]
+
+</IfModule>
+
+<IfModule !mod_rewrite.c>
+    # If we don't have mod_rewrite installed, all 404's
+    # can be sent to index.php, and everything works as normal.
+    # Submitted by: ElliotHaughin
+
+    #ErrorDocument 404 "/custom/index.php"
+</IfModule>
+
+<FilesMatch "\.svn/.*">
+	Order allow,deny
+	Deny from all
+</FilesMatch>
+
+
+
+#RewriteCond %{Remote_Addr} !^111\.11\.1\.1$
+#RewriteRule . maintenance.php [L]
