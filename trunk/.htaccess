@@ -1,4 +1,4 @@
-DirectoryIndex kb_index.php
+DirectoryIndex index.php
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
@@ -8,11 +8,11 @@ DirectoryIndex kb_index.php
     #RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R,L]
 
     RewriteCond %{REQUEST_URI} ^application.*
-    RewriteRule ^(.*)$ kb_index.php/$1 [L]
+    RewriteRule ^(.*)$ index.php/$1 [L]
 
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.*)$ kb_index.php/$1 [L]
+    RewriteRule ^(.*)$ index.php/$1 [L]
 
 </IfModule>
 
