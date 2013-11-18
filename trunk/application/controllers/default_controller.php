@@ -3,7 +3,7 @@
 class default_controller extends my_controller {
 
   public function index() {
-    die('kb');
+    $this->render_page('layout kb');
   }
 
   public function error_404() {
