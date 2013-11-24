@@ -6,6 +6,7 @@ class my_controller extends kb_controller {
 
   public function __construct() {
     parent::__construct();
+    $this->load->helper('url');
     $this->load->model('client');
   }
   public function render_page(){

@@ -1,0 +1,26 @@
+#header-wrapper{
+  background-color: #f6f6f6;
+  height: 100%;
+  position: relative;
+}
+
+#sic-settings-trigger{
+  background: transparent url('assets/kb/images/settings-gear-sm.png') no-repeat 0 0;
+  cursor: pointer;
+  height: 16px;
+  width: 16px;
+  position: absolute;
+  right: 4px;
+  top: 2px;
+}
+
+
+#sic-menu-holder #sic-menu-overlay-close-trigger{
+  background: transparent url('assets/kb/images/settings-gear-sm.png') no-repeat 0 0;
+  cursor: pointer;
+  height: 16px;
+  width: 16px;
+  position: absolute;
+  right: 4px;
+  top: 2px;
+}
