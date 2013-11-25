@@ -16,11 +16,21 @@
 
 
 #sic-menu-holder #sic-menu-overlay-close-trigger{
-  background: transparent url('assets/kb/images/settings-gear-sm.png') no-repeat 0 0;
+  background: transparent url('assets/kb/images/close-icon-small.gif') no-repeat 0 0;
   cursor: pointer;
   height: 16px;
   width: 16px;
   position: absolute;
   right: 4px;
+  top: 2px;
+}
+
+#sic-library-settings-trigger{
+  background: transparent url('assets/kb/images/media-library-small.png') no-repeat 0 0;
+  cursor: pointer;
+  height: 16px;
+  width: 16px;
+  position: absolute;
+  right: 24px;
   top: 2px;
 }

@@ -6,6 +6,7 @@ function sic_init_header(){
 
 function sic_header_menu_item_clicked(){
   var controller = $(this).attr('data-controller');
+  log('controller:' + controller);
   $('#sic-menu-holder').load(sic_url(controller), sic_menu_loaded);
 }
 
