@@ -60,9 +60,19 @@ table {
   position: absolute;
   width: 100%;
   height: 100%;
+  /*
   opacity: .70;
   filter:  alpha(opacity=70);
+  */
   position: relative;
+}
+
+#sic-menu-overlay .sic-menu-overlay-topbar{
+  height: 20px;
+}
+
+#sic-menu-holder #sic-menu-content{
+  margin-top: 20px;
 }
 
 
