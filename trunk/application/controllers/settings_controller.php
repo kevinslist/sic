@@ -6,7 +6,7 @@ class settings_controller extends my_controller {
     $assets = array(kb::icss('settings/settings-menu'), kb::iscript('settings/settings-menu'));
     $vars = array('assets' => implode("\r\n", $assets));
     $settings_form = new settings_form();
-    $settings_form->settings(kb::db_get('settings'));
+    $settings_form->values(settings::get());
     $vars['content'] = $settings_form->render();
     die(kb::view('menus/overlay', $vars));
   }
@@ -14,7 +14,7 @@ class settings_controller extends my_controller {
     $assets = array(kb::icss('settings/library-menu'), kb::iscript('settings/library-menu'));
     $vars = array('assets' => implode("\r\n", $assets));
     $library_settings_form = new library_settings_form();
-    $library_settings_form->settings(kb::db_get('settings'));
+    $library_settings_form->values(settings::get());
   
     $vars['content'] = $library_settings_form->render();
     die(kb::view('menus/overlay', $vars));

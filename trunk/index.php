@@ -2,11 +2,11 @@
 
 require_once 'application/third_party/kb/core/kb.php';
 define('ENVIRONMENT', 'development');
-
 if (defined('ENVIRONMENT')) {
   switch (ENVIRONMENT) {
     case 'development':
       error_reporting(E_ALL);
+      ini_set('display_errors', 'On');
       break;
     case 'testing':
     case 'production':
