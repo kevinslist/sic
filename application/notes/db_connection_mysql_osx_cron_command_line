@@ -1,0 +1,50 @@
+http://stackoverflow.com/questions/4219970/warning-mysql-connect-2002-no-such-file-or-directory-trying-to-connect-vi
+
+For some reason mysql on OS X gets the locations of the required socket file a bit wrong, but thanks to a veritable wizard I know (that's you, Gavin) the solution is as simple as setting up a symbolic link.
+
+You may have a socket (appearing as a zero length file) as /tmp/mysql.sock or /var/mysql/mysql.sock but 1 or more apps is looking in the other location for it.
+
+Rather than move the socket and have to edit config files and remember to keep edited files local and away from servers where the paths are correct, simply create a symbolic link so your mac finds the required socket, even when it's looking in the wrong place!
+
+If you have /tmp/mysql.sock but no /var/mysql/mysql.sock then...
+
+cd /var 
+sudo mkdir mysql
+sudo chmod 755 mysql
+cd mysql
+ln -s /tmp/mysql.sock mysql.sock
+
+If you have /var/mysql/mysql.sock but no /tmp/mysql.sock then
+
+cd /tmp
+ln -s /var/mysql/mysql.sock mysql.sock
+
+You will need permissions to create the directory and link, so just prefix the commands above with sudo if necessary.
+
+Hope this helps. It has sorted this exact issue for me on 3 macs so far.
+
+
+
+=================================
+=================================
+ 102 down vote
+	
+
+I also had this error, but could only fix it through the suggestion here.
+
+To summarize, use:
+
+127.0.0.1
+
+Instead of:
+
+localhost
+
+The reason is that "localhost" is a special name for the mysql driver making it use the unix socket to connect to mysql instead of the a tcp socket.
+share|improve this answer
+=================================
+=================================
+=================================
+=================================
+=================================
+=================================

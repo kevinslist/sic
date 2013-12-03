@@ -12,9 +12,7 @@ class my_controller extends kb_controller {
     $this->load->model('client');
     spl_autoload_register('my_controller::autoload');
   }
-  public function render_page(){
-    parent::render_page();
-  }
+
   public static function autoload($class) {
     $found = false;
     $paths = array(
