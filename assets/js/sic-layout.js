@@ -2,6 +2,9 @@ $(document).ready(sic_init_layout_global);
 var site_url = '/';
 
 function sic_init_layout_global(){
+}
+
+function sic_init_layout_global_Old(){
   sic_init_default_layout();
   sic_init_sections();
 }
