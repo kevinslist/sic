@@ -233,10 +233,10 @@
 		return CI_Controller::get_instance();
 	}
 
-
-	if (file_exists(APPPATH.'core/'.$CFG->config['subclass_prefix'].'Controller.php'))
+  $kb_check = APPPATH.'core/'.$CFG->config['subclass_prefix'].'controller.php';
+	if (file_exists($kb_check))
 	{
-		require APPPATH.'core/'.$CFG->config['subclass_prefix'].'Controller.php';
+		require $kb_check;
 	}
 
 	// Load the local application controller

@@ -139,7 +139,6 @@ if ( ! function_exists('load_class'))
 			if (file_exists($path.$directory.'/'.$class.'.php'))
 			{
 				$name = $prefix.$class;
-
 				if (class_exists($name) === FALSE)
 				{
 					require($path.$directory.'/'.$class.'.php');
@@ -148,15 +147,15 @@ if ( ! function_exists('load_class'))
 				break;
 			}
 		}
-
+    $kb_class = strtolower($class);
 		// Is the request a class extension?  If so we load it too
-		if (file_exists(APPPATH.$directory.'/'.config_item('subclass_prefix').$class.'.php'))
+		if (file_exists(APPPATH.$directory.'/'.config_item('subclass_prefix').$kb_class.'.php'))
 		{
-			$name = config_item('subclass_prefix').$class;
+			$name = config_item('subclass_prefix').$kb_class;
 
 			if (class_exists($name) === FALSE)
 			{
-				require(APPPATH.$directory.'/'.config_item('subclass_prefix').$class.'.php');
+				require(APPPATH.$directory.'/'.config_item('subclass_prefix').$kb_class.'.php');
 			}
 		}
 
