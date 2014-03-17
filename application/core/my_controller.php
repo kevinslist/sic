@@ -2,11 +2,11 @@
 
 if (!defined('BASEPATH')){  exit('No direct script access allowed'); }
 
-
 class my_controller extends kb_controller {
 
   public function __construct() {
-    parent::__construct();
+    parent::__construct('sic-bootstrap-1');
+    $this->config->load('assets');
     $this->load->database();
     $this->load->helper('url');
     $this->load->model('client');
