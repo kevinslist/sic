@@ -5,7 +5,7 @@ DirectoryIndex index.php
     RewriteRule .*\.svn/.* - [F]
 
     RewriteCond %{SERVER_PORT} 80
-    #RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R,L]
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R,L]
 
     RewriteCond %{REQUEST_URI} ^application.*
     RewriteRule ^(.*)$ index.php/$1 [L]
