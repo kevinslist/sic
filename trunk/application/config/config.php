@@ -14,7 +14,7 @@ $config['charset'] = 'UTF-8';
 
 $config['enable_hooks'] = FALSE;
 
-$config['subclass_prefix'] = 'MY_';
+$config['subclass_prefix'] = 'my_';
 
 $config['permitted_uri_chars'] = 'a-z 0-9~%.:_\-';
 

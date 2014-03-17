@@ -1,7 +1,7 @@
 <?php
 
 class client extends kb_client{
-  
-  static function init(){
+  public function init(){
+    parent::init();
   }
 }

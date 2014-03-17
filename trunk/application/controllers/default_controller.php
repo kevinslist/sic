@@ -1,20 +1,9 @@
 <?php
 
 class default_controller extends my_controller {
-
-  public function index() {
-    $this->render_page('layout kb');
+  public function home(){
+    $vars = array('google_signin_block'=>kb::view('snippets/google-signin-block'));
+    $content = $this->client->logged_in() ? kb::view('home/logged_in', $vars) : kb::view('home/logged_out', $vars);
+    $this->render_page($content);
   }
-  public function phpinfo(){
-    print phpinfo();
-    die();
-  }
-  public function error_404() {
-    $this->index();
-  }
-
-  public function error_403() {
-    $this->index();
-  }
-
 }
