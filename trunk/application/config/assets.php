@@ -5,5 +5,6 @@ $config['kb_css'] = array(
 );
 $config['kb_js'] = array(
     'assets/js/sic-global.js',
-    'assets/js/sic-layout.js'
+    'assets/js/sic-layout.js',
+    'assets/js/sic-login.js',
 );
