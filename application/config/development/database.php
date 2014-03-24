@@ -48,8 +48,8 @@
 $active_group = 'default';
 $active_record = TRUE;
 
-$db['default']['dbdriver'] = 'mysql';
-$db['default']['bsg_prop_name'] = 'mysql_sic';
+$db['default']['kb_db_props_file'] = '/var/www/props/kb_sic_db_props.php';
+$db['default']['kb_db_props_key'] = 'mysql_sic';
 
 
 
