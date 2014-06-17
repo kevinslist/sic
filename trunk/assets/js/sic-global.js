@@ -36,7 +36,7 @@ function sic_check_main_item_inited(){
 function sic_init_new_main_item(){
   $(this).attr('data-sic-inited',true);
   var f = $(this).attr('data-sic-init-function');
-  window[f]('kevinbB');;
+  window[f]();
 }
 
 
