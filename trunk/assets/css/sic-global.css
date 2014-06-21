@@ -60,7 +60,7 @@ table {
   margin: 0px;
   width: 100%;
 }
-#sic-main-menu li{
+#sic-main-menu li a{
   background: linear-gradient(#F5F7F6, #F2F4F3);
   border-bottom: 1px solid #CCC;
   display: block;
