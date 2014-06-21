@@ -5,6 +5,7 @@ class lights_home_controller extends my_controller {
     parent::__construct();
   }
   public function index(){
-    die('<div>KB: ' . kb_hue::get_ip() . '</div>');
+    $r = hue::do_hue();
+    $this->render_page(kb::view('lights/lights-main-menu'));
   }
 }

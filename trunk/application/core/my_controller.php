@@ -5,7 +5,7 @@ if (!defined('BASEPATH')) {
 }
 
 class my_controller extends kb_controller {
-
+  var $kb_content;
   public function __construct() {
     parent::__construct('sic-bootstrap-1');
     $this->force_login = TRUE;
@@ -13,20 +13,23 @@ class my_controller extends kb_controller {
     $this->load->database();
     $this->load->helper('url');
     $this->load->model('client');
+    $this->kb_content = array();
   }
 
   public function index() {
+    $this->kb_content['global-main-menu'] = kb::view('global/main-menu');
     $this->render_page();
   }
 
-  public function render_page($content = '') {
-    $sic_content = array(
-                          kb::view('global/main-menu'),
-                          kb::view('global/top-menu'),
-                          $content
-                      );
-
-    parent::render_page(implode("\r\n", $sic_content));
+  public function render_page($content = NULL) {
+      if(!empty($content)){
+          if(is_array($content)){
+            $this->kb_content = array_merge($this->kb_content, $content);
+          }else{
+            $this->kb_content['default'] = $content;
+          }
+      }
+    parent::render_page(implode("\r\n", $this->kb_content));
   }
 
   public function login($method = NULL, $params = NULL) {
