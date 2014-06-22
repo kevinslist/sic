@@ -17,5 +17,10 @@ function sic_login_user_authenticated(e, params){
 }
 
 function sic_login_user_authenticated_response(r){
-  if(r.status){ location.reload(); }
+  if(r.status){ 
+    alert('reload ?');
+    location.reload(); 
+  }else{
+    alert('error k ?');
+  }
 }
