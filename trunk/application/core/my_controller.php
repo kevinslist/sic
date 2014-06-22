@@ -64,10 +64,11 @@ class my_controller extends kb_controller {
 
       switch ($_POST['provider']) {
         case 'google':
+  
           $access_token = !empty($_POST['access_token']) ? $_POST['access_token'] : NULL;
           if (!empty($access_token)) {
             $google_url = 'https://www.googleapis.com/plus/v1/people/me?access_token=' . $access_token;
-            $json = kb::curl($google_url);
+            $json = kb::curl($google_url);  
             if (!empty($json)) {
               $json_decoded = json_decode($json, TRUE);
               if (is_array($json_decoded) && !empty($json_decoded['id'])) {
