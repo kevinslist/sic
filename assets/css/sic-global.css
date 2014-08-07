@@ -63,6 +63,7 @@ table {
 #sic-main-menu li a{
   background: linear-gradient(#F5F7F6, #F2F4F3);
   border-bottom: 1px solid #CCC;
+  cursor: pointer;
   display: block;
   font-size: 200%;
   font-weight: 500;
