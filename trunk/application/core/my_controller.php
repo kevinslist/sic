@@ -107,7 +107,7 @@ class my_controller extends kb_controller {
     if ($this->force_login && !$this->client->logged_in()) {
       $this->login($method, $params);
     } else {
-      parent::_remap();
+      parent::_remap($method, $params);
     }
   }
 
