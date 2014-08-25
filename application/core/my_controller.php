@@ -6,13 +6,16 @@ if (!defined('BASEPATH')) {
 
 class my_controller extends kb_controller {
   var $kb_content;
+  
   public function __construct() {
     parent::__construct('sic-bootstrap-1');
-    $this->force_login = TRUE;
-    $this->config->load('assets');
-    $this->load->database();
+    if(!empty($_SERVER['REMOTE_ADDR'])){
+      $this->force_login = TRUE;
+      $this->config->load('assets');
+      $this->load->model('client');
+    }
     $this->load->helper('url');
-    $this->load->model('client');
+    $this->load->database();
     $this->kb_content = array();
   }
 
