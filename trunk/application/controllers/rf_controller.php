@@ -1,8 +1,9 @@
 <?php
 
-class proc_rf_remote_reader_controller extends my_controller {
+class rf_controller extends my_controller {
 
   public function index($arg = NULL) {
+    sleep(10);
     $this->kill_rtl_433();
     $this->load->helper('process_rtl433');
     $app_directory = dirname(dirname(__FILE__));
