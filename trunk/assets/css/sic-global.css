@@ -82,4 +82,18 @@ table {
 }
 
 
+.kb-debug *{
+  background-color: #ffFFFF;
+  -webkit-touch-callout: text;
+  -webkit-user-select: text;
+  -khtml-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+  margin: 10px;
+  padding: 10px;
+  font-size: 110%;
+  font-family: monospace;
+}
+
 
