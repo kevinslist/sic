@@ -3,7 +3,7 @@ var site_url = '/';
 
 function sic_init_global(){
   site_url = $('body').attr('data-site-url');
-  log('site_url:'+site_url);
+  //log('site_url:'+site_url);
 }
 
 function kb_add_hover_class(){
