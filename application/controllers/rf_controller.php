@@ -3,8 +3,9 @@
 class rf_controller extends my_controller {
 
   public function index($arg = NULL) {
-    sleep(10);
+    sleep(2);
     $this->kill_rtl_433();
+    sleep(2);
     $this->load->helper('process_rtl433');
     $app_directory = dirname(dirname(__FILE__));
     process_rtl433::start($app_directory, $arg);
