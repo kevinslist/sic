@@ -15,8 +15,7 @@ time, mark, audio, video {
 	padding: 0;
 	border: 0;
 	font: inherit;
-  font-family: 'Roboto', sans-serif;
-	font-size: 12px;
+        font-family: 'Roboto', sans-serif;
 	vertical-align: baseline;
 }
 /* HTML5 display-role reset for older browsers */
@@ -60,19 +59,23 @@ table {
   margin: 0px;
   width: 100%;
 }
+
+
+#sic-main-menu li{
+  font-size: 200%;
+}
+
 #sic-main-menu li a{
   background: linear-gradient(#F5F7F6, #F2F4F3);
   border-bottom: 1px solid #CCC;
   cursor: pointer;
   display: block;
-  font-size: 200%;
   font-weight: 500;
   padding: 30px 0px;
   text-align: center;
   
   -webkit-user-select: none;
   -moz-user-select: none;
-  
 }
 
 #sic-main-menu li:hover{
@@ -80,7 +83,6 @@ table {
   cursor: pointer;
   color: #4CBB17;
 }
-
 
 .kb-debug *{
   background-color: #ffFFFF;
