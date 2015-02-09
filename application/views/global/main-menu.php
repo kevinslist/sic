@@ -3,6 +3,7 @@
     <li data-sic-load-view="remote/remote-home"><a href="<?php echo site_url('remote/remote-home'); ?>" class="main-menu-item">&#9084; Matrix</a></li>
     <li data-sic-load-view="lights/lights-home"><a href="<?php echo site_url('lights/lights-home'); ?>" class="main-menu-item"><span class="fa fa-lightbulb-o"></span> Hue Lights</a></li>
     <li data-sic-load-view="music"><a href="music" class="main-menu-item"><span class="glyphicon glyphicon-headphones"></span> music</a></li>
+    <li data-sic-load-view="computer"><a href="computer/computer-home/on" class="main-menu-item"><span class="fa fa-desktop"></span> computer ON</a></li>
     <li data-sic-load-view="settings/settings-home"><a href="settings/settings-home" class="main-menu-item">Sic Settings</a></li>
   </ul>
 </div>
