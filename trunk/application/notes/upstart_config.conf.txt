@@ -1,0 +1,11 @@
+description  "Init script RTL RF Remote Capture"
+
+start on started JOB=mysql
+stop on shutdown
+
+setuid www-data
+nice -9
+
+script
+	exec php /var/www/docs/default/index.php upstart_parent > /home/www-data/foo.log 2>&1
+end script
