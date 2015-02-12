@@ -51,6 +51,10 @@ class upstart_parent_controller extends my_controller {
               print $line;
             }
           } else {
+            if($check_process % 100 == 0){
+              print 'UpstartProcess Still Running....' . PHP_EOL;
+              $check_process = 100;
+            }
             $check_process++;
             usleep(14201);
           }
