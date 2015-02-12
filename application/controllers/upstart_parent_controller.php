@@ -12,6 +12,7 @@ class upstart_parent_controller extends my_controller {
 
   public function index($arg = NULL) {
     $this->kill_all_my_children();
+ 
     $this->load->helper('process_kbrtl');
     $child_script_path = 'php ' . dirname(dirname(dirname(__FILE__))) . '/index.php rtl_433 start ';
 
@@ -25,6 +26,7 @@ class upstart_parent_controller extends my_controller {
       print $child_script . PHP_EOL;
       $child = array();
       $child['resource_id'] = proc_open($child_script, $this->descriptorspec, $child['pipes']);
+      sleep(4);
       $this->children[] = $child;
     }
     foreach ($this->children as $process) {
@@ -39,14 +41,18 @@ class upstart_parent_controller extends my_controller {
       $do_quit = TRUE;
       foreach ($this->children as $process) {
         $info = proc_get_status($process['resource_id']);
-        if ((int) $info['running'] || $check_process < 10 ) {
+        if ((int) $info['running'] || $check_process < 100 ) {
           $do_quit = FALSE;
           $line = fgets($process['pipes'][1]);
           if (!empty($line)) {
-            print $line . PHP_EOL;
+            print $line;
+            while(!empty($line)){
+              $line = fgets($process['pipes'][1]);
+              print $line;
+            }
           } else {
             $check_process++;
-            usleep(142069);
+            usleep(14201);
           }
         }
       }
@@ -61,8 +67,10 @@ class upstart_parent_controller extends my_controller {
         $kill = 'kill -9 ' . (int) $line;
         print $kill . PHP_EOL;
         exec("$kill");
-        sleep(1);
+        sleep(2);
       }
+    }else{
+      print 'NO RTL_433 PROCESSES RUNNING' . PHP_EOL;
     }
   }
 

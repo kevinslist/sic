@@ -9,7 +9,10 @@ class my_controller extends kb_controller {
   
   public function __construct() {
     parent::__construct('sic-bootstrap-1');
-    if(!empty($_SERVER['REMOTE_ADDR'])){
+    $called_controller = $this->router->fetch_class();
+    
+    if(!empty($_SERVER['REMOTE_ADDR']) && 'signal_controller' != $called_controller){
+      
       $this->force_login = TRUE;
       $this->config->load('assets');
       $this->load->model('client');
