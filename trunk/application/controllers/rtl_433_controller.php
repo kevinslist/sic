@@ -60,7 +60,7 @@ class rtl_433_controller extends my_controller {
         $this->signal = array();
         array_push($this->signal, $frames);
       } else {
-        //$this->log('SPACE:' . $l);
+        $this->log('SPACE:' . $l);
       }
 
 
@@ -83,7 +83,7 @@ class rtl_433_controller extends my_controller {
           $this->is_signal = false;
           
           $t = file_get_contents('https://k/signal/' . $signal_base64);
-          //$this->log($t);
+          $this->log($t);
         }
       }
     } else {
@@ -107,7 +107,7 @@ class rtl_433_controller extends my_controller {
     }
     $signal_count = count($this->signal);
     if (in_array($signal_count, array(87, 55))) {
-      //$this->log('VALID SIGNAL: ' . $signal_count);
+      $this->log('VALID SIGNAL: ' . $signal_count);
       $this->is_signal = true;
       $this->set_remote_header_code();
       $this->set_remote_code();
@@ -117,7 +117,7 @@ class rtl_433_controller extends my_controller {
       //$this->log('REPEAT SIGNAL: ');
       //$this->log($this->last_pulse);
     } else {
-      //$this->log('OTHER SIGNAL:' . $signal_count);
+      $this->log('OTHER SIGNAL:' . $signal_count);
     }
   }
   
