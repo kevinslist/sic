@@ -14,7 +14,7 @@ class signal_controller extends my_controller {
     //print 'SIGNAL.INDEX.:' . $base_64_command;
     $c = unserialize(base64_decode(urldecode($base_64_command)));
     if(!$c['is-repeat']){
-      //var_export($c);
+      var_export($c);
       signal_controller::do_send_signal('#'.$c['header-string'], $c['remote-string'], $c['last-signal']);
     }
   }
