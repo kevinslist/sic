@@ -1,7 +1,7 @@
 <?php
 
 class upstart_parent_controller extends my_controller {
-
+  
   var $children = array();
   var $descriptorspec = array(
     0 => array("pipe", "r"),
@@ -12,7 +12,7 @@ class upstart_parent_controller extends my_controller {
 
   public function index($arg = NULL) {
     $this->kill_all_my_children();
-
+    ini_set('MAX_EXECUTION_TIME', -1);
     $this->load->helper('process_kbrtl');
     $child_script_path = 'php ' . dirname(dirname(dirname(__FILE__))) . '/index.php rtl_433 start ';
 
