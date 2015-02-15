@@ -5,18 +5,36 @@
  * https://irdatabase.globalcache.com/api/v1/057d6b19-5f2c-4deb-bd7c-31f659caaf4e/manufacturers
  */
 class signal_controller extends my_controller {
+  static $signal_last_sent = 0;
+  static $received_signal;
+  static $signal_last_sent_key = 'kb_signal_last_sent';
+  static $memcache_obj = null;
   
+  static $cache = array();
+     
   public function __construct() {
     parent::__construct();
   }
   public function index($base_64_command = NULL){
     
-    //print 'SIGNAL.INDEX.:' . $base_64_command;
+    //print 'SIGNAL.INDEX.BASE64_ENCODED:' . $base_64_command;
     $c = unserialize(base64_decode(urldecode($base_64_command)));
     if(!$c['is-repeat']){
-      var_export($c);
-      signal_controller::do_send_signal('#'.$c['header-string'], $c['remote-string'], $c['last-signal']);
+      signal_controller::$received_signal = $c; 
+      $last_sent_new = (int)$c['last-signal'];
+      // validate based on last sent
+      if(signal_controller::validate_new_signal_time($last_sent_new)){
+        signal_controller::do_send_signal('#'.$c['header-string'], $c['remote-string'], $c['last-signal']);
+      }
+      
+    }else{
+      print 'SIGNAL RECEIVED REPEAT.....' . PHP_EOL;
     }
+  }
+  
+  static function validate_new_signal_time($last_sent_new = 0){
+    $last_sent_old = (int)kb::pval(self::$signal_last_sent_key);
+    return $last_sent_new > $last_sent_old + 3;
   }
   
   static function do_send_signal($remote_code, $current_signal, $current_time){
