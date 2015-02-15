@@ -21,6 +21,7 @@ class rtl_433_controller extends my_controller {
   
 
   public function start($arg = NULL) {
+    ini_set('MAX_EXECUTION_TIME', -1);
     print 'DONGLE(' . $arg . ') RUNNING on:' . gethostname() . PHP_EOL;
     $this->dongle_index = $arg;
     //$command = 'rtl_433 -f ' . (433882002 + $this->dongle_index) . ' -s 425001 -d ' . $arg . '  2>&1';
