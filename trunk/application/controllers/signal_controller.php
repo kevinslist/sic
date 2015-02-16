@@ -11,6 +11,7 @@ class signal_controller extends my_controller {
   static $signal_last_sent = 0;
   static $received_signal;
   static $signal_last_sent_key = 'kb_signal_last_sent';
+  static $signal_key_check_special_last = 0;
   static $memcache_obj = null;
   static $cache = array();
 
@@ -32,6 +33,22 @@ class signal_controller extends my_controller {
       print '<<< ! SIGNAL RECEIVED INVALID >>>' . PHP_EOL;
     }
   }
+  
+  public function check_special(){
+    $current_check_special_time = microtime(true);
+    $last_sent_check_special = (float) kb::pval(signal_controller::$signal_key_check_special_last);
+    if(0 >= $last_sent_check_special){
+      // firsttime
+      kb::pval(signal_controller::$signal_key_check_special_last, $current_check_special_time);
+      $this->log('SERVER. SIGNAL. CHECK_Special:INIT' . $last_sent_check_special . ':::' . $current_check_special_time);
+    }else{
+      $diff = $current_check_special_time - $last_sent_check_special;
+      if($diff > 3.9){
+        //$this->log('SERVER. SIGNAL. CHECK_Special:' . $diff);
+        kb::pval(signal_controller::$signal_key_check_special_last, $current_check_special_time);
+      }
+    }
+  }
 
   static function validate_signal_time($last_sent_new = 0, $repeat = false) {
     $key = self::$signal_last_sent_key .= ($repeat ? '_repeat' : '_full');
@@ -43,17 +60,21 @@ class signal_controller extends my_controller {
     $current_time = (int) $signal['last-signal'];
     $remote_code = '#' . $signal['header-string'];
     $current_signal = $signal['remote-string'];
-    $signal_name = signal_controller::$channel_codes[$current_signal];
+    if (isset(signal_controller::$channel_codes[$current_signal])) {
+      $signal_name = signal_controller::$channel_codes[$current_signal];
 
-    if (!$signal['is-repeat']) {
-      itach::$remotes[$remote_code]['repeat'] = 0;
-      itach::$remotes[$remote_code]['previous-signal'] = $current_signal;
-      itach::$remotes[$remote_code]['last-sent'] = $current_time;
-    } else {
-      print 'SIGNAL do_send_signal RECEIVED REPEAT.....' . PHP_EOL;
+      if (!$signal['is-repeat']) {
+        itach::$remotes[$remote_code]['repeat'] = 0;
+        itach::$remotes[$remote_code]['previous-signal'] = $current_signal;
+        itach::$remotes[$remote_code]['last-sent'] = $current_time;
+        itach::send_signal($remote_code, $signal_name);
+      } else {
+        print 'DONT SEND REPEAT RIGHT NOW>>>' . PHP_EOL;
+      }
+      //itach::send_signal($remote_code, $signal_name);
+    }else{
+      print 'SIGNAL RECEIVED INVALID' . PHP_EOL;
     }
-
-    itach::send_signal($remote_code, $signal_name);
   }
 
   static $channel_codes = array(

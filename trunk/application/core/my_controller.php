@@ -107,6 +107,14 @@ class my_controller extends kb_controller {
     }
     print json_encode($response);
   }
+  
+  
+  public function log($str) {
+    $t_str = trim($str);
+    if(!empty($t_str)){
+      print $t_str . PHP_EOL;
+    }
+  }
 
   function _remap($method = NULL, $params = NULL) {
     //kb::dump($this->client);
