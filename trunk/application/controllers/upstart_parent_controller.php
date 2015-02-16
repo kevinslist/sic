@@ -80,7 +80,7 @@ class upstart_parent_controller extends my_controller {
         }
       }
       if ($check_process % 1500 == 0) {
-        print 'UpstartProcess(es) Still Running:' . $process_running_count . PHP_EOL;
+        //print 'UpstartProcess(es) Still Running:' . $process_running_count . PHP_EOL;
         $check_process = 100;
       }
     }
