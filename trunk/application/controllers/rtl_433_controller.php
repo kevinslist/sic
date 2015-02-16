@@ -82,7 +82,7 @@ class rtl_433_controller extends my_controller {
           $this->is_repeat = false;
           $this->is_signal = false;
           
-          $t = file_get_contents('https://k/signal/' . $signal_base64);
+          $t = file_get_contents('https://k/signal/validate/' . $signal_base64);
           $this->log($t);
         }
       }
