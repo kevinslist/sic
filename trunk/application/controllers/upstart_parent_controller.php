@@ -16,7 +16,7 @@ class upstart_parent_controller extends my_controller {
     $this->kill_all_my_children();
     ini_set('MAX_EXECUTION_TIME', -1);
     //$this->load->helper('process_kbrtl');
-    $child_script_path = 'php ' . dirname(dirname(dirname(__FILE__))) . '/index.php rtl_433 start ';
+    $child_script_path = 'php ' . dirname(dirname(dirname(__FILE__))) . '/cron.php rtl_433 start ';
     exec('rtl_433 -k 2>&1', $output);
     $dongle_count = (int) array_shift($output);
     //print('DONGLE COUNT:' . $dongle_count) . PHP_EOL;

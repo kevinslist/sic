@@ -11,9 +11,15 @@ class signal_controller extends my_controller {
   static $signal_last_sent = 0;
   static $received_signal;
   static $signal_last_sent_key = 'kb_signal_last_sent';
-  static $signal_key_check_special_last = 0;
+  static $signal_key_check_special_last = 'kb_signal_key_check_special_last';
   static $memcache_obj = null;
   static $cache = array();
+  var $current_signal;
+  static $sem_key_validate = '123321';
+  static $sem_key_check_special = '123322';
+  static $sem_max = '1';
+  static $sem_permissions = 0666;
+  static $sem_auto_release = 1;
 
   public function __construct() {
     parent::__construct();
@@ -22,15 +28,27 @@ class signal_controller extends my_controller {
   public function validate($base_64_command = NULL) {
 
     //print 'SIGNAL.INDEX.BASE64_ENCODED:' . $base_64_command;
-    $c = unserialize(base64_decode(urldecode($base_64_command)));
-    if (is_array($c)) {
-      $last_sent_new = (int) $c['last-signal'];
-      $valid_time = signal_controller::valid_signal_time($last_sent_new, $c['is-repeat']);
-      if ($valid_time) {
-        $c['signal-name'] = config_channel::valid_remote_code($c['remote-string']);
-        if ($c['signal-name']) {
-          config_router::route($c);
+    $this->current_signal = unserialize(base64_decode(urldecode($base_64_command)));
+    if (is_array($this->current_signal) && !empty($this->current_signal)) {
+      try {
+        $semaphore = sem_get(signal_controller::$sem_key_validate, signal_controller::$sem_max, signal_controller::$sem_permissions, signal_controller::$sem_auto_release);
+        //$this->log('Attempting to acquire semaphore');
+        sem_acquire($semaphore);
+        $valid_time = signal_controller::valid_signal_time();
+
+        if ($valid_time) {
+          $this->current_signal['signal-name'] = config_channel::valid_remote_code($this->current_signal['remote-string']);
+          if ($this->current_signal['signal-name']) {
+            $key = self::$signal_last_sent_key .= ($this->current_signal['is-repeat'] ? '_repeat' : '_full');
+            $last_sent_old = (int) kb::pval($key, $valid_time);
+            config_router::route($this->current_signal);
+          }
         }
+      } catch (Exception $ex) {
+        $this->log('EXCEPTION IN VALIDATE:');
+        $this->log(ex);
+      } finally {
+        sem_release($semaphore);
       }
     } else {
       print '<<< ! SIGNAL RECEIVED INVALID >>>' . PHP_EOL;
@@ -39,40 +57,61 @@ class signal_controller extends my_controller {
 
   public function check_special() {
     $current_check_special_time = microtime(true);
-    $last_sent_check_special = (float) kb::pval(signal_controller::$signal_key_check_special_last);
-    if (0 >= $last_sent_check_special) {
-      // firsttime
-      kb::pval(signal_controller::$signal_key_check_special_last, $current_check_special_time);
-      $this->log('SERVER. SIGNAL. CHECK_Special:INIT' . $last_sent_check_special . ':::' . $current_check_special_time);
-    } else {
-      $diff = $current_check_special_time - $last_sent_check_special;
-      if ($diff > 3.9) {
-        //$this->log('SERVER. SIGNAL. CHECK_Special:' . $diff);
+    //$this->log('check_special>getlast>:');
+    
+    try{
+      $semaphore = sem_get(signal_controller::$sem_key_check_special, signal_controller::$sem_max, signal_controller::$sem_permissions, signal_controller::$sem_auto_release);
+      //$this->log('Attempting to acquire semaphore_check_special');
+      sem_acquire($semaphore);
+      $last_sent_check_special = (float) kb::pval(signal_controller::$signal_key_check_special_last);
+      
+      if (0 >= $last_sent_check_special) {
+        // firsttime
         kb::pval(signal_controller::$signal_key_check_special_last, $current_check_special_time);
+        $this->log('SERVER. SIGNAL. CHECK_Special:INIT' . $last_sent_check_special . ':::' . $current_check_special_time);
+      } else {
+        $diff = $current_check_special_time - $last_sent_check_special;
+        if ($diff > 2.7) {
+          //$this->log('SERVER. SIGNAL. CHECK_Special:' . $diff);
+          kb::pval(signal_controller::$signal_key_check_special_last, $current_check_special_time);
+          config_router::route_special();
+        }
       }
+      
+    } catch (Exception $ex) {
+        $this->log('EXCEPTION IN check_special:');
+        $this->log(ex);
+    } finally {
+      sem_release($semaphore);
     }
+    
+    
   }
 
-  static function valid_signal_time($last_sent_new = 0, $repeat = false) {
-    $key = self::$signal_last_sent_key .= ($repeat ? '_repeat' : '_full');
-    $last_sent_old = (int) kb::pval($key);
-    return $last_sent_new > $last_sent_old + 3;
-  }
+  public function valid_signal_time() {
+    $do_return = false;
+    if (!empty($this->current_signal)) {
+      $last_sent_new = (int) $this->current_signal['last-signal'];
+      $key_full = self::$signal_last_sent_key . '_full';
+      $last_sent_old = (int) kb::pval($key_full);
+      $this->current_signal['last-sent'] = $last_sent_old;
 
-  static function do_send_signal($signal = null) {
-    $current_time = (int) $signal['last-signal'];
-    $remote_code = '#' . $signal['header-string'];
-    $current_signal = $signal['remote-string'];
+      $diff = $last_sent_new - $last_sent_old;
+      $diff = $last_sent_new - $last_sent_old;
+      $this->current_signal['diff-last-full'] = $diff;
+      $this->current_signal['valid-time'] = $diff > 3;
 
-    if (!$signal['is-repeat']) {
-      itach::$remotes[$remote_code]['repeat'] = 0;
-      itach::$remotes[$remote_code]['previous-signal'] = $current_signal;
-      itach::$remotes[$remote_code]['last-sent'] = $current_time;
-      itach::send_signal($remote_code, $signal['signal-name']);
-    } else {
-      print 'DONT SEND REPEAT RIGHT NOW>>>' . PHP_EOL;
+      if ($this->current_signal['valid-time'] && $this->current_signal['is-repeat']) {
+        $key_repeat = self::$signal_last_sent_key . '_repeat';
+        $last_sent_old = (int) kb::pval($key_repeat);
+        $diff = $last_sent_new - $last_sent_old;
+        $diff = $last_sent_new - $last_sent_old;
+        $this->current_signal['diff-last-repeat'] = $diff;
+        $this->current_signal['valid-time'] = $diff > 3;
+      }
+      $do_return = $this->current_signal['valid-time'] ? $last_sent_new : false;
     }
-    //itach::send_signal($remote_code, $signal_name);
+    return $do_return;
   }
 
 }
