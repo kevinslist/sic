@@ -19,7 +19,7 @@ class upstart_parent_controller extends my_controller {
     $child_script_path = 'php ' . dirname(dirname(dirname(__FILE__))) . '/cron.php rtl_433 start ';
     exec('rtl_433 -k 2>&1', $output);
     $dongle_count = (int) array_shift($output);
-    //print('DONGLE COUNT:' . $dongle_count) . PHP_EOL;
+    print('DONGLE COUNT:' . $dongle_count) . PHP_EOL;
     foreach ($output as $dongle) {
       $dongle_info = preg_split('`:`', $dongle, -1, PREG_SPLIT_NO_EMPTY);
       $child_script = $child_script_path . $dongle_info[0] . ' 2>&1';
