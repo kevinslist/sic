@@ -13,6 +13,8 @@ class upstart_parent_controller extends my_controller {
   var $special_check_last_sent = 0;
 
   public function index($arg = NULL) {
+    error_reporting(E_ALL);
+    ini_set('display_erros', 'On');
     $this->kill_all_my_children();
     ini_set('MAX_EXECUTION_TIME', -1);
     //$this->load->helper('process_kbrtl');
@@ -41,8 +43,6 @@ class upstart_parent_controller extends my_controller {
 
     $check_process = 0;
     $do_quit = FALSE;
-    error_reporting(E_ALL);
-    ini_set('display_erros', 'On');
     while (!$do_quit) {
       $do_quit = TRUE;
       $process_running_count = 0;
