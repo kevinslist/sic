@@ -14,7 +14,7 @@ class upstart_parent_controller extends my_controller {
 
   public function index($arg = NULL) {
     error_reporting(E_ALL);
-    ini_set('display_erros', 'On');
+    ini_set('display_errors', 'On');
     $this->kill_all_my_children();
     ini_set('MAX_EXECUTION_TIME', -1);
     //$this->load->helper('process_kbrtl');
