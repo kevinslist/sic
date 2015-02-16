@@ -18,7 +18,6 @@ class rtl_433_controller extends my_controller {
   var $remote_string = null;
   var $is_repeat = 0;
   var $is_signal = false;
-  
 
   public function start($arg = NULL) {
     ini_set('MAX_EXECUTION_TIME', -1);
@@ -61,7 +60,7 @@ class rtl_433_controller extends my_controller {
         $this->signal = array();
         array_push($this->signal, $frames);
       } else {
-        $this->log('SPACE:' . $l);
+        //$this->log('SPACE:' . $l);
       }
 
 
@@ -234,7 +233,7 @@ class rtl_433_controller extends my_controller {
   }
 
   public function log($str) {
-    print 'LOG(' . $this->dongle_index . '):' . $str . PHP_EOL;
+    parent::log('LOG(' . $this->dongle_index . '):' . $str);
   }
 
 }
