@@ -233,7 +233,10 @@ class rtl_433_controller extends my_controller {
   }
 
   public function log($str) {
-    parent::log('LOG(' . $this->dongle_index . '):' . $str);
+    $trimmed = trim($str);
+    if(!empty($trimmed)){
+      parent::log('LOG(' . $this->dongle_index . '):' . $trimmed);
+    }
   }
 
 }
