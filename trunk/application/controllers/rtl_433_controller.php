@@ -117,7 +117,7 @@ class rtl_433_controller extends my_controller {
       //$this->log('REPEAT SIGNAL: ');
       //$this->log($this->last_pulse);
     } else {
-      $this->log('OTHER SIGNAL:' . $signal_count);
+      //$this->log('OTHER SIGNAL:' . $signal_count);
     }
   }
   
