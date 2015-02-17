@@ -39,9 +39,30 @@ class signal_controller extends my_controller {
         if ($valid_time) {
           $this->current_signal['signal-name'] = config_channel::valid_remote_code($this->current_signal['remote-string']);
           if ($this->current_signal['signal-name']) {
-            $key = self::$signal_last_sent_key .= ($this->current_signal['is-repeat'] ? '_repeat' : '_full');
-            $last_sent_old = (int) kb::pval($key, $valid_time);
-            config_router::route($this->current_signal);
+            $do_send = (!$this->current_signal['is-repeat'] || preg_match('`_volume_`i', $this->current_signal['signal-name']));
+            if($do_send){
+              $last_sent_old = (int) kb::pval(self::$signal_last_sent_key . '_full', $valid_time);
+              
+              $new_key = $this->current_signal['header-string'] . $this->current_signal['signal-name'];
+                
+              if($this->current_signal['is-repeat']){
+                $old_key = kb::pval('signal_last_signal_sent');
+                if($new_key != $old_key){
+                  $do_send = false;
+                }else{
+                  $last_sent_old = (int) kb::pval(self::$signal_last_sent_key . '_repeat', $valid_time);
+                }
+              }
+              if($do_send){
+                kb::pval('signal_last_signal_sent', $new_key);
+                config_router::route($this->current_signal);
+              }else{
+                $this->log('SIGNAL.NOT>VALID.SIGNAL_TIME>WRONG_REPEAT_SIGNAL');
+              }
+            }else{
+              //$this->log('SIGNAL.NOT>VALID.SIGNAL_TIME');
+            }
+            
           }
         }
       } catch (Exception $ex) {
@@ -71,7 +92,7 @@ class signal_controller extends my_controller {
         $this->log('SERVER. SIGNAL. CHECK_Special:INIT' . $last_sent_check_special . ':::' . $current_check_special_time);
       } else {
         $diff = $current_check_special_time - $last_sent_check_special;
-        if ($diff > 2.7) {
+        if ($diff > 1.1) {
           //$this->log('SERVER. SIGNAL. CHECK_Special:' . $diff);
           kb::pval(signal_controller::$signal_key_check_special_last, $current_check_special_time);
           config_router::route_special();
@@ -107,7 +128,7 @@ class signal_controller extends my_controller {
         $diff = $last_sent_new - $last_sent_old;
         $diff = $last_sent_new - $last_sent_old;
         $this->current_signal['diff-last-repeat'] = $diff;
-        $this->current_signal['valid-time'] = $diff > 3;
+        $this->current_signal['valid-time'] = $diff > 2;
       }
       $do_return = $this->current_signal['valid-time'] ? $last_sent_new : false;
     }
