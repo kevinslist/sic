@@ -107,7 +107,7 @@ class rtl_433_controller extends my_controller {
     }
     $signal_count = count($this->signal);
     if (in_array($signal_count, array(87, 55))) {
-      $this->log('VALID SIGNAL: ' . $signal_count);
+      //$this->log('VALID SIGNAL: ' . $signal_count);
       $this->is_signal = true;
       $this->set_remote_header_code();
       $this->set_remote_code();
