@@ -1,6 +1,7 @@
 <?php
 
 require_once 'application/third_party/kb/core/kb.php';
+define('KB_APP_PATH', dirname(__FILE__). '/');
 define('ENVIRONMENT', 'development');
 if (defined('ENVIRONMENT')) {
   switch (ENVIRONMENT) {
