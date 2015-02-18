@@ -18,10 +18,11 @@ class rtl_433_controller extends my_controller {
   var $remote_string = null;
   var $is_repeat = 0;
   var $is_signal = false;
+  
 
   public function start($arg = NULL) {
     ini_set('MAX_EXECUTION_TIME', -1);
-    print 'DONGLE(' . $arg . ') RUNNING on:' . gethostname() . PHP_EOL;
+    print 'DONGLE PROCESS(' . $arg . ') RUNNING on:' . gethostname() . PHP_EOL;
     $this->dongle_index = $arg;
     //$command = 'rtl_433 -f ' . (433882002 + $this->dongle_index) . ' -s 425001 -d ' . $arg . '  2>&1';
     //$command = 'rtl_433 -f ' . (433869420 + 10*$this->dongle_index)  . $arg . '  2>&1';
@@ -71,8 +72,8 @@ class rtl_433_controller extends my_controller {
         $current_time_pieces = explode(':', $this->last_pulse);
         if($this->is_signal){
           $signal = array(
-            'header-string' => $this->header_string,
-            'remote-string' => $this->remote_string,
+            'remote-id' => $this->header_string,
+            'signal-id' => $this->remote_string,
             'is-repeat' => $this->is_repeat,
             'last-signal' => (int)end($current_time_pieces),
           );
@@ -82,7 +83,7 @@ class rtl_433_controller extends my_controller {
           $this->is_repeat = false;
           $this->is_signal = false;
           
-          $t = file_get_contents('https://k/cron.php/signal/validate/' . $signal_base64);
+          $t = file_get_contents(kb::config('KB_QUEUE_NEW_SIGNAL_URL') . $signal_base64);
           $this->log($t);
         }
       }
