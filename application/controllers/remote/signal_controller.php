@@ -25,7 +25,7 @@ class signal_controller extends my_controller {
     parent::__construct();
   }
 
-  public function validate($base_64_command = NULL) {
+  public function queue($base_64_command = NULL) {
 
     //print 'SIGNAL.INDEX.BASE64_ENCODED:' . $base_64_command;
     $this->current_signal = unserialize(base64_decode(urldecode($base_64_command)));
@@ -33,37 +33,41 @@ class signal_controller extends my_controller {
       try {
         $semaphore = sem_get(signal_controller::$sem_key_validate, signal_controller::$sem_max, signal_controller::$sem_permissions, signal_controller::$sem_auto_release);
         //$this->log('Attempting to acquire semaphore');
-        sem_acquire($semaphore);
-        $valid_time = signal_controller::valid_signal_time();
+        $did_acquire_semaphore = sem_acquire($semaphore);
+        if(true === $did_acquire_semaphore){
+          $valid_time = signal_controller::valid_signal_time();
 
-        if ($valid_time) {
-          $this->current_signal['signal-name'] = config_channel::valid_remote_code($this->current_signal['remote-string']);
-          if ($this->current_signal['signal-name']) {
-            $do_send = (!$this->current_signal['is-repeat'] || preg_match('`_volume_`i', $this->current_signal['signal-name']));
-            if($do_send){
-              $last_sent_old = (int) kb::pval(self::$signal_last_sent_key . '_full', $valid_time);
-              
-              $new_key = $this->current_signal['header-string'] . $this->current_signal['signal-name'];
-                
-              if($this->current_signal['is-repeat']){
-                $old_key = kb::pval('signal_last_signal_sent');
-                if($new_key != $old_key){
-                  $do_send = false;
-                }else{
-                  $last_sent_old = (int) kb::pval(self::$signal_last_sent_key . '_repeat', $valid_time);
-                }
-              }
+          if ($valid_time) {
+            $this->current_signal['signal-name'] = config_channel::valid_remote_code($this->current_signal['signal-id']);
+            if ($this->current_signal['signal-name']) {
+              $do_send = (!$this->current_signal['is-repeat'] || preg_match('`_volume_`i', $this->current_signal['signal-name']));
               if($do_send){
-                kb::pval('signal_last_signal_sent', $new_key);
-                config_router::route($this->current_signal);
+                $last_sent_old = (int) kb::pval(self::$signal_last_sent_key . '_full', $valid_time);
+
+                $new_key = $this->current_signal['remote-id'] . $this->current_signal['signal-name'];
+
+                if($this->current_signal['is-repeat']){
+                  $old_key = kb::pval('signal_last_signal_sent');
+                  if($new_key != $old_key){
+                    $do_send = false;
+                  }else{
+                    $last_sent_old = (int) kb::pval(self::$signal_last_sent_key . '_repeat', $valid_time);
+                  }
+                }
+                if($do_send){
+                  kb::pval('signal_last_signal_sent', $new_key);
+                  config_router::route($this->current_signal);
+                }else{
+                  $this->log('SIGNAL.NOT>VALID.SIGNAL_TIME>WRONG_REPEAT_SIGNAL');
+                }
               }else{
-                $this->log('SIGNAL.NOT>VALID.SIGNAL_TIME>WRONG_REPEAT_SIGNAL');
+                //$this->log('SIGNAL.NOT>VALID.SIGNAL_TIME');
               }
-            }else{
-              //$this->log('SIGNAL.NOT>VALID.SIGNAL_TIME');
+
             }
-            
           }
+        }else{
+          $this->log('FAILED TO ACQUIRE SEMAPHORE: signal_controller');
         }
       } catch (Exception $ex) {
         $this->log('EXCEPTION IN VALIDATE:');

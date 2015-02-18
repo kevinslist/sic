@@ -11,11 +11,12 @@ class my_controller extends kb_controller {
     parent::__construct('sic-bootstrap-1');
     $called_controller = $this->router->fetch_class();
     
-    if(!empty($_SERVER['REMOTE_ADDR']) && 'signal_controller' != $called_controller){
-      
+    if(!kb::is_cron()){
       $this->force_login = TRUE;
       $this->config->load('assets');
       $this->load->model('client');
+    }else{
+      ini_set('MAX_EXECUTION_TIME', -1);
     }
     $this->load->helper('url');
     $this->load->database();
