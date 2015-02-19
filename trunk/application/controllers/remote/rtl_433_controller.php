@@ -74,7 +74,7 @@ class rtl_433_controller extends my_controller {
           $signal = array(
             'remote-id' => $this->header_string,
             'signal-id' => $this->remote_string,
-            'is-repeat' => $this->is_repeat,
+            'is-repeat' => (int)$this->is_repeat,
             'last-signal' => (int)end($current_time_pieces),
           );
           $signal_serialized = serialize($signal);

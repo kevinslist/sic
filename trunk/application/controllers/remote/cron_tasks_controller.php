@@ -23,10 +23,10 @@ class cron_tasks_controller extends my_controller {
       $current_time = microtime(true);
       $diff = $current_time - self::$special_signal_last_checked;
       if($diff > 4.8){
-        $this->log('DO SPECIAL CHECK');
+        //$this->log('DO SPECIAL CHECK');
         self::$special_signal_last_checked = $current_time;
-      }elseif($diff > 2.8){
-        config_router::process_signal();
+      }elseif($diff > 4.1){
+        config_router::check_signal_queue();
       }
       
       
