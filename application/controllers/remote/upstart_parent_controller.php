@@ -28,7 +28,7 @@ class upstart_parent_controller extends my_controller {
     $dongle_count = (int) array_shift($output);
     print('DONGLE COUNT:' . $dongle_count) . PHP_EOL;
 
-    $this->spawn_children();
+    $this->spawn_children($output);
     if ($upstart_is_master) {
       $this->spaw_cron_tasks();
     }
@@ -98,7 +98,7 @@ class upstart_parent_controller extends my_controller {
     stream_set_blocking($this->cron['pipes'][1], 0);
   }
 
-  public function spawn_children() {
+  public function spawn_children($output = null) {
     $child_script_path = kb::config('KB_RTL_433_PROCESSOR_SCRIPT_PATH');
     foreach ($output as $dongle) {
       $child = array();
