@@ -4,9 +4,9 @@ class upstart_parent_controller extends my_controller {
 
   var $children = array();
   var $descriptorspec = array(
-      0 => array("pipe", "r"),
-      1 => array("pipe", "w"),
-      2 => array("pipe", "w"),
+    0 => array("pipe", "r"),
+    1 => array("pipe", "w"),
+    2 => array("pipe", "w"),
   );
   var $pipes = array();
   var $last_sent_cron = 0;
@@ -57,7 +57,9 @@ class upstart_parent_controller extends my_controller {
             while (!empty($trimmed_line)) {
               $line = fgets($process['pipes'][1]);
               $trimmed_line = trim($line);
-              $this->log($line);
+              if (!empty($trimmed_line)) {
+                $this->log($line);
+              }
             }
           } else {
             $check_process++;
@@ -68,15 +70,17 @@ class upstart_parent_controller extends my_controller {
           print_r($process);
         }
       }
-      if(!is_null($this->cron)){
+      if (!is_null($this->cron)) {
         $line = fgets($this->cron['pipes'][1]);
         $trimmed_line = trim($line);
         if (!empty($trimmed_line)) {
-          $this->log('{CRON}'. $line);
+          $this->log('{CRON}' . $line);
           while (!empty($trimmed_line)) {
             $line = fgets($process['pipes'][1]);
             $trimmed_line = trim($line);
-            $this->log('{CRON}'. $line);
+            if (!empty($trimmed_line)) {
+              $this->log('{CRON}' . $line);
+            }
           }
         }
       }
