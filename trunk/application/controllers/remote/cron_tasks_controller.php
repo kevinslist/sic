@@ -25,7 +25,7 @@ class cron_tasks_controller extends my_controller {
       if($diff > 4.8){
         //$this->log('DO SPECIAL CHECK');
         self::$special_signal_last_checked = $current_time;
-      }elseif($diff > 4.1){
+      }else{
         config_router::check_signal_queue();
       }
       

@@ -20,6 +20,8 @@ class queue_controller extends my_controller {
 
     if (is_array($current_signal) && !empty($current_signal['remote-id']) && !empty($current_signal['signal-id']) && !empty($current_signal['last-signal'])) {
       self::_do_queue_signal($current_signal, $base_64_command);
+    }else {
+      print '<<< ! QUEUE SIGNAL RECEIVED INVALID >>>' . PHP_EOL;
     }
   }
 
