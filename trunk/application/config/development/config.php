@@ -11,4 +11,5 @@ $config['KB_RTL_433_PROCESSOR_SCRIPT_PATH'] = 'php ' . KB_APP_PATH . '/cron.php 
 $config['KB_CRON_TASKS_SCRIPT_PATH']        = 'php ' . KB_APP_PATH . '/cron.php remote/cron_tasks/start  2>&1';
 $config['CRON_TASKS_GLOBAL_USLEEP']         = 500000; // 1/2 second
 
-$config['KB_CONFIG_ROUTER_INFO_SEM_LOCK_PORT']         = '123323'; // 1/2 second
+$config['KB_CONFIG_ROUTER_INFO_SEM_LOCK_PORT']          = '123323'; // 1/2 second
+$config['KB_SIGNAL_QUEUE_KEY']                          = 'kb_config_router_signal_queue';
