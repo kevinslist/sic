@@ -22,10 +22,12 @@ class cron_tasks_controller extends my_controller {
       usleep(kb::config('CRON_TASKS_GLOBAL_USLEEP'));
       $current_time = microtime(true);
       $diff = $current_time - self::$special_signal_last_checked;
-      if($diff > 0.8){
+      if($diff > 4.8){
         $this->log('DO SPECIAL CHECK');
+        self::$special_signal_last_checked = $current_time;
+      }elseif($diff > 2.8){
+        config_router::process_signal();
       }
-      
       
       
       
