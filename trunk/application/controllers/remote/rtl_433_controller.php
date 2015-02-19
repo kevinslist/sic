@@ -82,7 +82,7 @@ class rtl_433_controller extends my_controller {
           
           $this->is_repeat = false;
           $this->is_signal = false;
-          
+          $this->log("sned queue signal:" . time());
           $t = file_get_contents(kb::config('KB_QUEUE_NEW_SIGNAL_URL') . $signal_base64);
           $this->log($t);
         }
