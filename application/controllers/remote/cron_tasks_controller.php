@@ -18,15 +18,13 @@ class cron_tasks_controller extends my_controller {
   public function index(){
     
     while(true){
-      
       usleep(kb::config('CRON_TASKS_GLOBAL_USLEEP'));
-      $current_time = microtime(true);
-      $diff = $current_time - self::$special_signal_last_checked;
-      if($diff > 1.8){
-        self::$special_signal_last_checked = $current_time;
-        config_router::process_special_buffer();
-      }
       config_router::check_signal_queue();
+      $ct = microtime(true);
+      if( ($ct - self::$special_signal_last_checked) > 5){
+        self::$special_signal_last_checked = $ct;
+        //print 'cron tasks still running...' . PHP_EOL;
+      }
       
     }
   }
