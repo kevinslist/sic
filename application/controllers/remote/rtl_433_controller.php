@@ -63,7 +63,7 @@ class rtl_433_controller extends my_controller {
         $this->signal = array();
         array_push($this->signal, $frames);
       } else {
-        $this->log('SPACE(' . $this->dongle_index . '):' . $l);
+        //$this->log('SPACE(' . $this->dongle_index . '):' . $l);
       }
 
 
