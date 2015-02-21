@@ -63,7 +63,7 @@ class rtl_433_controller extends my_controller {
         $this->signal = array();
         array_push($this->signal, $frames);
       } else {
-        //$this->log('SPACE(' . $this->dongle_index . '):' . $l);
+        $this->log('SPACE(' . $this->dongle_index . '):' . $l);
       }
 
 
@@ -92,6 +92,8 @@ class rtl_433_controller extends my_controller {
             //$this->log("sned queue signal:" . time());
             $t = file_get_contents(kb::config('KB_QUEUE_NEW_SIGNAL_URL') . $signal_base64);
             $this->log($t);
+          }else{
+            $this->log('NOT VALID SIGNAL OR REMOTE: 1: ' . $this->remote_id . '::::' . $valid_remote_id . "::::2:" . $valid_signal_id);
           }
         }
       }
@@ -237,7 +239,7 @@ class rtl_433_controller extends my_controller {
         $remote_id .= '1';
       }
     }
-    $this->remote_id = $remote_id;
+    $this->remote_id = '#' . $remote_id;
     //$this->log('$remote_id:' . $remote_id);
   }
 
