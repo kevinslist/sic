@@ -11,6 +11,7 @@ class rtl_433_controller extends my_controller {
   var $empty_frames = 0;
   var $signal_started = false;
   var $last_pulse;
+  var $hostname = 'hostname';
   var $dongle_index = 0;
   var $dongle_inited = false;
   var $signal = null;
@@ -22,7 +23,8 @@ class rtl_433_controller extends my_controller {
 
   public function start($arg = NULL) {
     ini_set('MAX_EXECUTION_TIME', -1);
-    print 'DONGLE PROCESS(' . $arg . ') RUNNING on:' . gethostname() . PHP_EOL;
+    $this->hostname = gethostname();
+    print 'DONGLE PROCESS(' . $arg . ') RUNNING on:' . $this->hostname . PHP_EOL;
     $this->dongle_index = $arg;
     //$command = 'rtl_433 -f ' . (433882002 + $this->dongle_index) . ' -s 425001 -d ' . $arg . '  2>&1';
     //$command = 'rtl_433 -f ' . (433869420 + 10*$this->dongle_index)  . $arg . '  2>&1';
@@ -72,10 +74,11 @@ class rtl_433_controller extends my_controller {
         $current_time_pieces = explode(':', $this->last_pulse);
         if($this->is_signal){
           $signal = array(
-            'remote-id' => $this->header_string,
-            'signal-id' => $this->remote_string,
-            'is-repeat' => (int)$this->is_repeat,
-            'last-signal' => (int)end($current_time_pieces),
+            'remote_command_remote_id' => $this->header_string,
+            'remote_command_signal_id' => $this->remote_string,
+            'remote_command_is_repeat' => (int)$this->is_repeat,
+            'remote_command_time_sent' => (int)end($current_time_pieces),
+            'remote_command_host_dongle' => $this->hostname . ':' . $this->dongle_index,
           );
           $signal_serialized = serialize($signal);
           $signal_base64 = urlencode(base64_encode($signal_serialized));
