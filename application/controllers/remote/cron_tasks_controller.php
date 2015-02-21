@@ -13,6 +13,10 @@ class cron_tasks_controller extends my_controller {
   public function __construct() {
     parent::__construct();
     self::$special_signal_last_checked = microtime(true);
+    gefen_8x8_matrix::init();
+    itach::init();
+    hue::init();
+    denon::init();
   }
 
   public function index(){
