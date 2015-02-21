@@ -15,8 +15,8 @@ class rtl_433_controller extends my_controller {
   var $dongle_index = 0;
   var $dongle_inited = false;
   var $signal = null;
-  var $header_string = null;
-  var $remote_string = null;
+  var $remote_id = null;
+  var $signal_id = null;
   var $is_repeat = 0;
   var $is_signal = false;
   
@@ -63,7 +63,7 @@ class rtl_433_controller extends my_controller {
         $this->signal = array();
         array_push($this->signal, $frames);
       } else {
-        //$this->log('SPACE:' . $l);
+        //$this->log('SPACE(' . $this->dongle_index . '):' . $l);
       }
 
 
@@ -73,21 +73,26 @@ class rtl_433_controller extends my_controller {
         $this->process_signal();
         $current_time_pieces = explode(':', $this->last_pulse);
         if($this->is_signal){
-          $signal = array(
-            'remote_command_remote_id' => $this->header_string,
-            'remote_command_signal_id' => $this->remote_string,
-            'remote_command_is_repeat' => (int)$this->is_repeat,
-            'remote_command_time_sent' => (int)end($current_time_pieces),
-            'remote_command_host_dongle' => $this->hostname . ':' . $this->dongle_index,
-          );
-          $signal_serialized = serialize($signal);
-          $signal_base64 = urlencode(base64_encode($signal_serialized));
+          $valid_signal_id = config_channel::valid_signal_id($this->signal_id);
+          $valid_remote_id = isset(config_remote::$remote_map[$this->remote_id]);
           
-          $this->is_repeat = false;
-          $this->is_signal = false;
-          //$this->log("sned queue signal:" . time());
-          $t = file_get_contents(kb::config('KB_QUEUE_NEW_SIGNAL_URL') . $signal_base64);
-          $this->log($t);
+          if($valid_remote_id && $valid_signal_id){
+            $signal = array(
+              'remote_command_remote_id' => $this->remote_id,
+              'remote_command_signal_id' => $this->signal_id,
+              'remote_command_is_repeat' => (int)$this->is_repeat,
+              'remote_command_time_sent' => (int)end($current_time_pieces),
+              'remote_command_host_dongle' => $this->hostname . ':' . $this->dongle_index,
+            );
+            $signal_serialized = serialize($signal);
+            $signal_base64 = urlencode(base64_encode($signal_serialized));
+
+            $this->is_repeat = false;
+            $this->is_signal = false;
+            //$this->log("sned queue signal:" . time());
+            $t = file_get_contents(kb::config('KB_QUEUE_NEW_SIGNAL_URL') . $signal_base64);
+            $this->log($t);
+          }
         }
       }
     } else {
@@ -164,22 +169,22 @@ class rtl_433_controller extends my_controller {
     $avg_max = ceil($avg_max_total / $avg_max_count);
     //$this->log('$avg_min:' . $avg_min . ':$avg_max:' . $avg_max);
 
-    $remote_string = '';
+    $signal_id = '';
 
     foreach ($remote_spaces as $s) {
       $min_diff = $s - $avg_min;
       $max_diff = $avg_max - $s;
       
       if($min_diff <= 50 && $max_diff <= 50){
-        $remote_string .= '1';
+        $signal_id .= '1';
       }elseif ($min_diff < $max_diff) {
-        $remote_string .= '0';
+        $signal_id .= '0';
       } else {
-        $remote_string .= '1';
+        $signal_id .= '1';
       }
     }
-    $this->remote_string = $remote_string;
-    //$this->log('$remote_string:' . $remote_string);
+    $this->signal_id = $signal_id;
+    //$this->log('$signal_id:' . $signal_id);
   }
   
   
@@ -221,19 +226,19 @@ class rtl_433_controller extends my_controller {
     $avg_max = ceil($avg_max_total / $avg_max_count);
     //$this->log('$avg_min:' . $avg_min . ':$avg_max:' . $avg_max);
 
-    $header_string = '';
+    $remote_id = '';
 
     foreach ($header_spaces as $s) {
       $min_diff = $s - $avg_min;
       $max_diff = $avg_max - $s;
       if ($min_diff < $max_diff) {
-        $header_string .= '0';
+        $remote_id .= '0';
       } else {
-        $header_string .= '1';
+        $remote_id .= '1';
       }
     }
-    $this->header_string = $header_string;
-    //$this->log('$header_string:' . $header_string);
+    $this->remote_id = $remote_id;
+    //$this->log('$remote_id:' . $remote_id);
   }
 
   public function log($str) {
