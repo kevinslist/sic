@@ -12,7 +12,6 @@ class cron_tasks_controller extends my_controller {
 
   public function __construct() {
     parent::__construct();
-    self::$special_signal_last_checked = microtime(true);
     gefen_8x8_matrix::init();
     itach::init();
     hue::init();
@@ -20,16 +19,10 @@ class cron_tasks_controller extends my_controller {
   }
 
   public function index(){
-    
+    $this->db->save_queries = FALSE;
     while(true){
       usleep(kb::config('CRON_TASKS_GLOBAL_USLEEP'));
       config_router::check_signal_queue();
-      $ct = microtime(true);
-      if( ($ct - self::$special_signal_last_checked) > 5){
-        self::$special_signal_last_checked = $ct;
-        //print 'cron tasks still running...' . PHP_EOL;
-      }
-      
     }
   }
 

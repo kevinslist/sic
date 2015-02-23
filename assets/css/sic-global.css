@@ -78,6 +78,21 @@ table {
   -moz-user-select: none;
 }
 
+
+#sic-main-menu li a:focus{
+  background: none;
+  background-color: #fea;
+  border-bottom: 1px solid #CCC;
+  cursor: pointer;
+  display: block;
+  font-weight: 500;
+  padding: 30px 0px;
+  text-align: center;
+  outline: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
+
 #sic-main-menu li:hover{
   background: linear-gradient( #FFF, #FFF);
   cursor: pointer;
