@@ -22,7 +22,6 @@ class rtl_433_controller extends my_controller {
   
 
   public function start($arg = NULL) {
-    ini_set('MAX_EXECUTION_TIME', -1);
     $this->hostname = gethostname();
     print 'DONGLE PROCESS(' . $arg . ') RUNNING on:' . $this->hostname . PHP_EOL;
     $this->dongle_index = $arg;
@@ -93,7 +92,7 @@ class rtl_433_controller extends my_controller {
             $t = file_get_contents(kb::config('KB_QUEUE_NEW_SIGNAL_URL') . $signal_base64);
             $this->log($t);
           }else{
-            $this->log('NOT VALID SIGNAL OR REMOTE: 1: ' . $this->remote_id . '::::' . $valid_remote_id . "::::2:" . $valid_signal_id);
+            $this->log('NOT VALID SIGNAL OR REMOTE: (' . $this->hostname . ')(' . $this->dongle_index . ') ' . '::::[' . $valid_remote_id . "]:::::[" . $valid_signal_id);
           }
         }
       }
