@@ -13,3 +13,4 @@ $config['CRON_TASKS_GLOBAL_USLEEP']         = 25000; // microseconds
 
 $config['KB_CONFIG_ROUTER_INFO_SEM_LOCK_PORT']          = '123323'; // 1/2 second
 $config['KB_SIGNAL_QUEUE_KEY']                          = 'kb_config_router_signal_queue';
+$config['KB_ROKU_IP_PORT']                          = '192.168.1.125:8060';

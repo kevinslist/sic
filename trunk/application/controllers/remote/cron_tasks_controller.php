@@ -16,6 +16,7 @@ class cron_tasks_controller extends my_controller {
     itach::init();
     hue::init();
     denon::init();
+    roku::init();
   }
 
   public function index(){
