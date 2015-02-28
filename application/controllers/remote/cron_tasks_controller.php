@@ -12,10 +12,10 @@ class cron_tasks_controller extends my_controller {
 
   public function __construct() {
     parent::__construct();
-    gefen_8x8_matrix::init();
+    matrix::init();
     itach::init();
     hue::init();
-    denon::init();
+    avr::init();
     roku::init();
   }
 
