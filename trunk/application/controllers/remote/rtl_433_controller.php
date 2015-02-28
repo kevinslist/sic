@@ -92,7 +92,7 @@ class rtl_433_controller extends my_controller {
             $t = file_get_contents(kb::config('KB_QUEUE_NEW_SIGNAL_URL') . $signal_base64);
             $this->log($t);
           }else{
-            $this->log('NOT VALID SIGNAL OR REMOTE: (' . $this->hostname . ')(' . $this->dongle_index . ') ' . '::::[' . $valid_remote_id . "]:::::[" . $valid_signal_id);
+            //$this->log('NOT VALID SIGNAL OR REMOTE: (' . $this->hostname . ')(' . $this->dongle_index . ') ' . '::::[' . $valid_remote_id . "]:::::[" . $valid_signal_id);
           }
         }
       }
