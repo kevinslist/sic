@@ -3,12 +3,13 @@
 class rtl_433_controller extends my_controller {
 
   var $descriptorspec = array(
-    0 => array("pipe", "r"),
-    1 => array("pipe", "w"),
-    2 => array("pipe", "w"),
+      0 => array("pipe", "r"),
+      1 => array("pipe", "w"),
+      2 => array("pipe", "w"),
   );
   var $do_quit = false;
   var $empty_frames = 0;
+  var $space_counter = 0;
   var $signal_started = false;
   var $last_pulse;
   var $hostname = 'hostname';
@@ -19,20 +20,27 @@ class rtl_433_controller extends my_controller {
   var $signal_id = null;
   var $is_repeat = 0;
   var $is_signal = false;
-  
+  var $previous_signal_valid = false;
 
   public function start($arg = NULL) {
     $this->hostname = gethostname();
-    print 'DONGLE PROCESS(' . $arg . ') RUNNING on:' . $this->hostname . PHP_EOL;
+    print 'rtl_433_controller PROCESS INDEX(' . $arg . ') RUNNING on:' . $this->hostname . PHP_EOL;
     $this->dongle_index = $arg;
     //$command = 'rtl_433 -f ' . (433882002 + $this->dongle_index) . ' -s 425001 -d ' . $arg . '  2>&1';
     //$command = 'rtl_433 -f ' . (433869420 + 10*$this->dongle_index)  . $arg . '  2>&1';
     //$command = 'rtl_433 -f ' . (433882002 + $this->dongle_index) . ' -s 425001 -d ' . $arg . '  2>&1';
     //$command = 'rtl_433 -d ' . $arg . '  2>&1';
+
+
     $command = 'rtl_433 -f 433882002 -d ' . $arg . '  2>&1';
     $this->log('COMMAND:' . $command);
+
+    /* START PROCESS TO MONITOR rtl_433 output */
+
+
     $process = proc_open($command, $this->descriptorspec, $pipes);
     while (!$this->do_quit) {
+      // will block until line received
       $line = fgets($pipes[1]);
       $this->process_line($line);
     }
@@ -40,6 +48,7 @@ class rtl_433_controller extends my_controller {
   }
 
   public function process_line($line_in) {
+    // line should include 
     $l = trim($line_in);
 
     if ($this->dongle_inited) {
@@ -62,6 +71,11 @@ class rtl_433_controller extends my_controller {
         $this->signal = array();
         array_push($this->signal, $frames);
       } else {
+        $this->space_counter++;
+        if ($this->space_counter > 10) {
+          $alive = $this->keep_alive();
+          $this->log('KEEP ALIVE ALIVE?:(' . $alive . '):' . $l);
+        }
         //$this->log('SPACE(' . $this->dongle_index . '):' . $l);
       }
 
@@ -69,19 +83,21 @@ class rtl_433_controller extends my_controller {
 
       if ($this->signal_started && $this->empty_frames > 2) {
         $this->signal_started = false;
+
+        // determine whether valid signal
         $this->process_signal();
         $current_time_pieces = explode(':', $this->last_pulse);
-        if($this->is_signal){
+        if ($this->is_signal) {
           $valid_signal_id = config_channel::valid_signal_id($this->signal_id);
           $valid_remote_id = isset(config_remote::$remote_map[$this->remote_id]);
-          
-          if($valid_remote_id && $valid_signal_id){
+
+          if ($valid_remote_id && $valid_signal_id) {
             $signal = array(
-              'remote_command_remote_id' => $this->remote_id,
-              'remote_command_signal_id' => $this->signal_id,
-              'remote_command_is_repeat' => (int)$this->is_repeat,
-              'remote_command_time_sent' => (int)end($current_time_pieces),
-              'remote_command_host_dongle' => $this->hostname . ':' . $this->dongle_index,
+                'remote_command_remote_id' => $this->remote_id,
+                'remote_command_signal_id' => $this->signal_id,
+                'remote_command_is_repeat' => (int) $this->is_repeat,
+                'remote_command_time_sent' => (int) end($current_time_pieces),
+                'remote_command_host_dongle' => $this->hostname . ':' . $this->dongle_index,
             );
             $signal_serialized = serialize($signal);
             $signal_base64 = urlencode(base64_encode($signal_serialized));
@@ -91,7 +107,7 @@ class rtl_433_controller extends my_controller {
             //$this->log("sned queue signal:" . time());
             $t = file_get_contents(kb::config('KB_QUEUE_NEW_SIGNAL_URL') . $signal_base64);
             $this->log($t);
-          }else{
+          } else {
             //$this->log('NOT VALID SIGNAL OR REMOTE: (' . $this->hostname . ')(' . $this->dongle_index . ') ' . '::::[' . $valid_remote_id . "]:::::[" . $valid_signal_id);
           }
         }
@@ -106,6 +122,16 @@ class rtl_433_controller extends my_controller {
     }
   }
 
+  public function keep_alive() {
+
+    $file = fsockopen(kb::config('KB_MASTER_HOSTNAME'), 80, $errno, $errstr, 1);
+
+    if ($file) {
+      fclose($file);
+    }
+    return $file;
+  }
+
   public function process_signal() {
     $found_positive = false;
     while (!$found_positive) {
@@ -116,28 +142,30 @@ class rtl_433_controller extends my_controller {
       }
     }
     $signal_count = count($this->signal);
+
     if (in_array($signal_count, array(87, 55))) {
       //$this->log('VALID SIGNAL: ' . $signal_count);
+      $this->previous_signal_valid = true;
       $this->is_signal = true;
       $this->set_remote_header_code();
       $this->set_remote_code();
-    } elseif (3 == $signal_count) {
+    } elseif (3 == $signal_count && $this->previous_signal_valid) {
       $this->is_repeat = true;
       $this->is_signal = true;
       //$this->log('REPEAT SIGNAL: ');
       //$this->log($this->last_pulse);
     } else {
+      $this->previous_signal_valid = false;
       //$this->log('OTHER SIGNAL:' . $signal_count);
     }
   }
-  
-  
+
   public function set_remote_code() {
     //print_r($this->signal);
     $max_space = 0;
     $min_space = 999990;
     $remote_spaces = array();
-    
+
     for ($i = 23; $i < count($this->signal); $i += 2) {
       $v = abs((int) $this->signal[$i]);
       if ($v < $min_space) {
@@ -175,10 +203,10 @@ class rtl_433_controller extends my_controller {
     foreach ($remote_spaces as $s) {
       $min_diff = $s - $avg_min;
       $max_diff = $avg_max - $s;
-      
-      if($min_diff <= 50 && $max_diff <= 50){
+
+      if ($min_diff <= 50 && $max_diff <= 50) {
         $signal_id .= '1';
-      }elseif ($min_diff < $max_diff) {
+      } elseif ($min_diff < $max_diff) {
         $signal_id .= '0';
       } else {
         $signal_id .= '1';
@@ -187,9 +215,6 @@ class rtl_433_controller extends my_controller {
     $this->signal_id = $signal_id;
     //$this->log('$signal_id:' . $signal_id);
   }
-  
-  
-  
 
   public function set_remote_header_code() {
     $max_space = 0;
@@ -244,7 +269,7 @@ class rtl_433_controller extends my_controller {
 
   public function log($str) {
     $trimmed = trim($str);
-    if(!empty($trimmed)){
+    if (!empty($trimmed)) {
       parent::log('LOG(' . $this->dongle_index . '):' . $trimmed);
     }
   }
