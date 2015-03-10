@@ -3,13 +3,12 @@
 class rtl_433_controller extends my_controller {
 
   var $descriptorspec = array(
-      0 => array("pipe", "r"),
-      1 => array("pipe", "w"),
-      2 => array("pipe", "w"),
+    0 => array("pipe", "r"),
+    1 => array("pipe", "w"),
+    2 => array("pipe", "w"),
   );
   var $do_quit = false;
   var $empty_frames = 0;
-  var $space_counter = 0;
   var $signal_started = false;
   var $last_pulse;
   var $hostname = 'hostname';
@@ -71,10 +70,8 @@ class rtl_433_controller extends my_controller {
         $this->signal = array();
         array_push($this->signal, $frames);
       } else {
-        $this->space_counter++;
-        if ($this->space_counter > 10) {
+        if (abs($l) > 3001) {
           $alive = $this->keep_alive();
-          $this->log('KEEP ALIVE ALIVE?:(' . $alive . '):' . $l);
         }
         //$this->log('SPACE(' . $this->dongle_index . '):' . $l);
       }
@@ -93,11 +90,11 @@ class rtl_433_controller extends my_controller {
 
           if ($valid_remote_id && $valid_signal_id) {
             $signal = array(
-                'remote_command_remote_id' => $this->remote_id,
-                'remote_command_signal_id' => $this->signal_id,
-                'remote_command_is_repeat' => (int) $this->is_repeat,
-                'remote_command_time_sent' => (int) end($current_time_pieces),
-                'remote_command_host_dongle' => $this->hostname . ':' . $this->dongle_index,
+              'remote_command_remote_id' => $this->remote_id,
+              'remote_command_signal_id' => $this->signal_id,
+              'remote_command_is_repeat' => (int) $this->is_repeat,
+              'remote_command_time_sent' => (int) end($current_time_pieces),
+              'remote_command_host_dongle' => $this->hostname . ':' . $this->dongle_index,
             );
             $signal_serialized = serialize($signal);
             $signal_base64 = urlencode(base64_encode($signal_serialized));
@@ -123,13 +120,24 @@ class rtl_433_controller extends my_controller {
   }
 
   public function keep_alive() {
+    $alive = false;
+    $master_hostname = kb::config('KB_MASTER_HOSTNAME');
 
-    $file = fsockopen(kb::config('KB_MASTER_HOSTNAME'), 80, $errno, $errstr, 1);
-
-    if ($file) {
-      fclose($file);
+    if ($this->hostname == $master_hostname) {
+      for ($i = 1; $i <= (int) kb::config('KB_PI_COUNT'); $i++) {
+        //$host = 'kpi' . $i;
+        //$pingresult = exec("ping -c 1 $host", $outcome, $status);
+        //$alive = (0 == $status);
+      }
+    } else {
+      $file = fsockopen($master_hostname, 80, $errno, $errstr, 1);
+      if ($file) {
+        $alive = true;
+        fclose($file);
+      }
     }
-    return $file;
+
+    return $alive;
   }
 
   public function process_signal() {
